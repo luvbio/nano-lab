@@ -1,0 +1,1218 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>나노 바이오센서 탐구실</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&family=Do+Hyeon&display=swap">
+<style>
+/* Layout: 가상 실험대 — 위는 실험대 장면과 안내 메시지, 옆(모바일은 아래)은 도구 선반·실험 순서·실험 노트 */
+:root{
+  --bg:#F3F4EF; --panel:#FFFFFF; --bench:#E7EAE2; --plate:#3A3F46; --fg:#1C2126; --muted:#5E6670; --line:#D3D7CC;
+  --gold:#A8741A; --ruby:#B3263A; --cyan:#0C8F9C; --leaf:#3E7D3A;
+  --display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --body:"IBM Plex Sans KR",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#13161A; --panel:#1C2026; --bench:#171B20; --plate:#4A515A; --fg:#E7E9E4; --muted:#9AA2AC; --line:#2E343C;
+  --gold:#E0AE4E; --ruby:#F06A7A; --cyan:#3FD3E0; --leaf:#7FC27A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#13161A; --panel:#1C2026; --bench:#171B20; --plate:#4A515A; --fg:#E7E9E4; --muted:#9AA2AC; --line:#2E343C;
+  --gold:#E0AE4E; --ruby:#F06A7A; --cyan:#3FD3E0; --leaf:#7FC27A; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,40px);margin:0;line-height:1.15}
+header p{margin:4px 0 0;color:var(--muted);max-width:64ch}
+header .theme{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--gold);letter-spacing:.01em;max-width:none}
+header .sub2{margin:6px 0 0;color:var(--fg);font-weight:600;font-size:15px}
+.navwrap{display:flex;flex-direction:column}
+.tabs{position:relative;display:flex;gap:6px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--gold);border-radius:10px;padding:8px;margin-top:10px;animation:drop .18s ease-out}
+.tabs[hidden]{display:none}
+.tabs::before{content:"";position:absolute;top:-7px;left:var(--ax,16%);width:12px;height:12px;background:var(--panel);border-left:1px solid var(--gold);border-top:1px solid var(--gold);transform:translateX(-50%) rotate(45deg)}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.tabs button{font:inherit;font-weight:500;background:none;border:1px solid transparent;border-radius:8px;color:var(--muted);padding:8px 12px;cursor:pointer;text-align:left}
+.tabs button:hover{background:var(--bench);color:var(--fg)}
+.tabs button[aria-selected="true"]{background:var(--bench);border-color:var(--line);color:var(--fg);font-weight:700}
+.tabs .no{font-family:var(--mono);font-size:11px;margin-right:6px;color:var(--gold)}
+.tabs button[hidden]{display:none}
+.sess .sn::after{content:"▾";font-family:var(--body);font-size:14px;margin-left:6px;display:inline-block;transition:transform .15s}
+.sess[aria-expanded="true"] .sn::after{transform:rotate(180deg)}
+@media (max-width:520px){.tabs{flex-direction:column}.tabs button{width:100%}}
+.sessions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sess{font:inherit;text-align:left;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;display:flex;flex-direction:column;gap:3px;transition:border-color .15s,box-shadow .15s}
+.sess:hover{border-color:var(--gold)}
+.sess .sn{font-family:var(--display);font-size:22px;line-height:1.1;color:var(--muted)}
+.sess .st{font-size:12px;color:var(--muted);line-height:1.4}
+.sess[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.sess[aria-pressed="true"] .sn{color:var(--gold)}
+.sess[aria-pressed="true"] .st{color:var(--fg)}
+@media (max-width:520px){.sessions{gap:6px}.sess{padding:8px 10px}.sess .sn{font-size:19px}.sess .st{font-size:11px}}
+button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.exp{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:800px){.exp{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+@media (max-width:800px){#p-k{display:flex;flex-direction:column;align-items:stretch;gap:12px}#p-k>.col{display:contents}#p-k .k-res{order:1}#p-k .k-late{order:2}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0}
+h3{font-family:var(--display);font-size:19px;font-weight:400;letter-spacing:.02em;color:var(--cyan);margin:0 0 2px;display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+h3::before{content:"";flex:none;width:5px;height:18px;border-radius:2px;background:var(--cyan)}
+.lead{margin:0;color:var(--muted);font-size:14px}
+.scene svg{width:100%;height:auto;display:block;border-radius:8px}
+.scene svg text{font-family:var(--body);font-size:12px;fill:var(--fg)}
+.scene svg text.m{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.scene svg text.mu{fill:var(--muted)}
+.msg{border-radius:8px;padding:10px 12px;font-size:14px;background:var(--bg);border:1px solid var(--line);border-left-width:4px;min-height:46px}
+.msg[data-kind="hint"]{border-left-color:var(--gold)}
+.msg[data-kind="ok"]{border-left-color:var(--leaf)}
+.msg[data-kind="info"]{border-left-color:var(--cyan)}
+.tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tool{font:inherit;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--fg);display:flex;flex-direction:column;gap:1px}
+.tool:hover{border-color:var(--gold)}
+.tool:active{transform:translateY(1px)}
+.tool b{font-weight:500;font-size:14px}
+.tool small{color:var(--muted);font-size:12px}
+.tool.wide{grid-column:1/-1}
+.tool.reset{border-style:dashed}
+.grp{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--panel)}
+.seg{grid-column:1/-1;display:flex;flex-direction:column;gap:4px}
+.seg>span{font-size:14px;font-weight:700;color:var(--gold)}
+.seg>div{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:999px;padding:4px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.steps{margin:0;padding-left:22px;font-size:14px;display:flex;flex-direction:column;gap:3px}
+.steps li.ok{color:var(--muted);text-decoration:line-through}
+.steps li.now{font-weight:700}
+.steps li.now::marker{color:var(--gold)}
+.nb{margin:0;padding-left:18px;font-size:13px;max-height:200px;overflow:auto;display:flex;flex-direction:column;gap:3px}
+.nb:empty::before{content:"실험을 하면 관찰 내용이 여기에 기록됩니다.";color:var(--muted);margin-left:-18px}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;width:100%;font-size:13px}
+.tbl th,.tbl td{border:1px solid var(--line);padding:5px 8px;text-align:center}
+.tbl th{background:var(--bg);font-weight:500}
+.fn{color:var(--ruby);font-weight:700}
+.note{font-size:12px;color:var(--muted);margin:0}
+.stu{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 12px;font-size:14px}
+.stu label{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.stu input{font:inherit;border:1px solid var(--line);border-radius:6px;padding:4px 8px;background:var(--bg);color:var(--fg);width:5.5em}
+.stu input#stu-name{width:8em}
+.sub{display:flex;flex-wrap:wrap;gap:6px;border-top:1px dashed var(--line);padding-top:8px}
+.sub button{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:5px 10px;background:var(--bg);color:var(--fg);cursor:pointer}
+.sub button.pri{border-color:var(--gold);font-weight:600}
+.sub button:hover{border-color:var(--gold)}
+.subm{font-size:12px;color:var(--muted);width:100%;min-height:1em}
+
+.intro{grid-column:1/-1}
+.intro summary{cursor:pointer;font-weight:700;font-size:16px;list-style:none;display:flex;align-items:center;gap:8px}
+.intro summary::-webkit-details-marker{display:none}
+.intro summary::before{content:"▸";color:var(--gold);transition:transform .2s}
+.intro[open] summary::before{transform:rotate(90deg)}
+.ig{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+@media (max-width:800px){.ig{grid-template-columns:minmax(0,1fr)}}
+.ib{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.ib h4{margin:0;font-size:15px}.ib h4 b{font-family:var(--mono);color:var(--gold);margin-right:6px}
+.ib p{margin:0;font-size:14px;line-height:1.6}
+.ib svg{width:100%;height:auto;display:block}
+.ib svg.fs{margin:0 auto}
+.ib svg.fs4{width:100%;max-width:370px}
+.ib svg.fs2{width:100%;max-width:330px}
+
+.ib svg text{font-family:var(--body);font-size:11px;fill:var(--fg)}
+.ib svg text.mu{fill:var(--muted)}
+.ib .key{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.ig2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ramfig{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rf{margin:0;border:1px solid var(--line);border-radius:8px;padding:8px 10px 4px;background:var(--panel)}
+.rf figcaption{font-size:17px;margin-bottom:4px;display:flex;flex-direction:column;line-height:1.35}
+.rf svg{display:block;width:100%;max-width:230px;margin:0 auto}
+.rf figcaption span{font-size:13px;color:var(--muted)}
+@media (max-width:560px){.ramfig{grid-template-columns:minmax(0,1fr)}}
+.ib.wide{grid-column:1/-1}
+.wbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:14px;align-items:center}
+.wtext{display:flex;flex-direction:column;gap:8px}
+@media (max-width:800px){.wbody{grid-template-columns:minmax(0,1fr)}}
+.intro svg[role="img"]{cursor:zoom-in;transition:opacity .15s}
+.intro svg[role="img"]:hover{opacity:.82}
+.intro svg[role="img"]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.ib svg.fs3{width:100%;max-width:300px;margin:0 auto}
+.zhint{font-size:13px;color:var(--muted)}
+#zoom{position:fixed;inset:0;z-index:1000;background:rgba(10,14,22,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:4vh 4vw;cursor:zoom-out}
+#zoom[hidden]{display:none}
+#zoom .zbox{width:min(980px,92vw);max-height:84vh;overflow:auto;padding:18px 22px;background:var(--panel)}
+#zoom .zbox svg{width:100%!important;max-width:none!important;height:auto;max-height:74vh;margin:0 auto}
+#zoom .zbox .rf{border:0;padding:0;background:none}
+#zoom .zbox .rf figcaption{font-size:22px}
+#zoom .zbox .rf figcaption span{font-size:16px}
+#zoom .zcap{color:#fff;font-size:14px;opacity:.85}
+#zoom .zbox .live{border:0;padding:0;background:none}
+#zoom .zbox .live svg{max-height:58vh}
+#zoom .zhint{display:none}
+#zoom .zbox .live #fl-cap,#zoom .zbox .live #lfa-cap{font-size:18px}
+.miscon{margin-top:12px;background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--ruby);border-radius:6px;padding:10px 14px}
+.miscon h4{margin:0 0 6px;font-size:15px;color:var(--ruby)}
+.miscon ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.miscon li{display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.55}
+.miscon li{gap:6px}
+.miscon .x{align-self:flex-start;color:var(--ruby);font-weight:700;background:color-mix(in srgb,var(--ruby) 9%,transparent);border:1px solid var(--ruby);border-radius:6px;padding:4px 10px}
+.miscon .o{color:var(--fg);padding-left:10px}
+@media (max-width:800px){.ig2{grid-template-columns:minmax(0,1fr)}}
+.optg{display:flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--panel)}
+.optl{font-size:13px;font-weight:700;color:var(--gold);margin-right:4px}
+.credit{margin-top:24px;padding-top:14px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:13px;line-height:1.7}
+.credit p{margin:0}
+.isum{margin:12px 0 0;font-size:14px;background:var(--bg);border-left:4px solid var(--gold);border-radius:6px;padding:8px 12px}
+@keyframes ph{0%{offset-distance:0%;opacity:0}10%{opacity:1}90%{opacity:1}100%{offset-distance:100%;opacity:0}}
+.phot{animation:ph 3s linear infinite}
+@media (prefers-reduced-motion:reduce){.phot{animation:none;opacity:0}}
+
+</style>
+
+<div class="wrap">
+<header>
+  <p class="theme">눈에 보이지 않는 나노입자, 생명의 신호를 읽다</p>
+  <h1>나노 바이오센서 탐구실</h1>
+  <p class="sub2">항원·항체 반응에서 바이오센서까지</p>
+  <p>도구 선반의 실험 도구를 눌러 직접 실험해 보세요. 순서를 틀리면 실험대가 이유를 알려 줍니다. 수치와 반응 속도는 수업용으로 단순화했습니다.</p>
+</header>
+
+<div class="stu" aria-label="학생 정보">
+  <strong style="font-size:14px">내 정보</strong>
+  <label>반 <input id="stu-cls" inputmode="numeric" placeholder="예: 3"></label>
+  <label>번호 <input id="stu-num" inputmode="numeric" placeholder="예: 12"></label>
+  <label>이름 <input id="stu-name" placeholder="이름"></label>
+  <span class="note" style="font-size:12px">실험 노트를 선생님께 제출할 때 함께 보내져요.</span>
+</div>
+<div class="navwrap">
+<nav class="sessions" aria-label="차시 선택">
+  <button class="sess" data-sess="1" aria-pressed="true" aria-expanded="true" aria-controls="acts"><span class="sn">1차시</span><span class="st">신속항원검사 · LFA 원리 · 금나노 합성</span></button>
+  <button class="sess" data-sess="2" aria-pressed="false" aria-expanded="false" aria-controls="acts"><span class="sn">2차시</span><span class="st">카본닷 합성 · 카본닷 형광 원리</span></button>
+  <button class="sess" data-sess="3" aria-pressed="false" aria-expanded="false" aria-controls="acts"><span class="sn">3차시</span><span class="st">라만·SERS 원리 · 식물 SERS 측정</span></button>
+</nav>
+<nav class="tabs" id="acts" role="tablist" aria-label="활동 선택">
+  <button role="tab" id="tab-k" aria-selected="true"><span class="no">1차시 A</span>신속항원검사</button>
+  <button role="tab" id="tab-l" aria-selected="false"><span class="no">1차시 B</span>신속항원키트(LFA) 원리</button>
+  <button role="tab" id="tab-g" aria-selected="false"><span class="no">1차시 C</span>금나노 합성</button>
+  <button role="tab" id="tab-c" aria-selected="false" hidden><span class="no">2차시 A</span>카본닷 합성</button>
+  <button role="tab" id="tab-f" aria-selected="false" hidden><span class="no">2차시 B</span>카본닷 형광 원리</button>
+  <button role="tab" id="tab-r" aria-selected="false" hidden><span class="no">3차시 A</span>라만·SERS 원리</button>
+  <button role="tab" id="tab-p" aria-selected="false" hidden><span class="no">3차시 B</span>식물 SERS 측정</button>
+</nav>
+</div>
+
+<!-- 신속항원검사 -->
+<section class="exp" id="p-k">
+  <div class="col">
+    <div class="card scene"><div id="k-scene"></div></div>
+    <div class="msg" id="k-msg" data-kind="info">환자와 키트를 고른 뒤 검사를 시작하세요.</div>
+    <div class="card k-res"><h3>결과표</h3><div class="tbl" id="k-table"></div>
+      <p class="note">같은 환자를 금나노 키트와 카본닷 키트로 각각 검사해 결과표를 채워 보세요.</p></div>
+  </div>
+  <div class="col">
+    <div class="card"><h3>도구 선반</h3><div class="tools" id="k-tools"></div></div>
+    <div class="card k-late"><h3>실험 순서</h3><ol class="steps" id="k-steps"></ol></div>
+    <div class="card k-late"><h3>실험 노트</h3><ul class="nb" id="k-log"></ul>
+      <div class="sub"><button type="button" class="pri" data-sub="k">선생님께 제출</button><button type="button" data-copy="k">노트 복사</button><button type="button" data-save="k">텍스트 파일로 저장</button><div class="subm" id="k-subm"></div></div></div>
+  </div>
+</section>
+
+<section class="exp" id="p-l" hidden>
+  <details class="card intro" open>
+  <summary>신속항원키트(LFA)는 어떻게 작동할까?</summary>
+  <div class="ib" style="margin-top:8px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap"><span class="zhint">🔍 그림을 누르면 크게 볼 수 있어요</span><div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button type="button" class="tool" id="lfa-pos" style="flex-direction:row;padding:4px 10px;font-size:13px;border-color:var(--gold)">양성 시료 (항원 있음)</button>
+    <button type="button" class="tool" id="lfa-neg" style="flex-direction:row;padding:4px 10px;font-size:13px">음성 시료 (항원 없음)</button>
+    <button type="button" class="tool" id="lfa-play" style="flex-direction:row;padding:4px 10px;font-size:13px">⏸ 움직임 멈추기</button>
+  </div></div>
+    <svg id="lfa-svg" viewBox="0 0 640 215" role="img" aria-label="시료가 키트를 따라 흐르며 항원이 금나노-항체와 결합하고, 검사선과 대조선에 붙잡혀 빨간 줄이 생기는 움직이는 그림"></svg>
+    <p id="lfa-cap" style="margin:0;font-size:15px;font-weight:600;min-height:1.6em"></p>
+  </div>
+  <div class="ig">
+    <div class="ib"><h4><b>1</b>항원과 항체</h4><p>바이러스 표면에는 <strong>항원</strong>(특정 단백질)이 있어요. <strong>항체</strong>는 Y자 모양 단백질로, 꼭 맞는 항원에만 <strong>열쇠와 자물쇠처럼</strong> 달라붙어요.</p></div>
+    <div class="ib"><h4><b>2</b>금나노입자는 '색깔 표지'</h4><p>항체는 너무 작아서 눈에 안 보여요. 그래서 붉은색 <strong>금나노입자</strong>(1차시 C에서 직접 만들어 봐요)를 항체에 붙여요. 금나노가 한곳에 많이 모이면 <strong>빨간 줄</strong>로 보여요.</p></div>
+    <div class="ib"><h4><b>3</b>두 줄의 의미</h4><p><strong>T선</strong>(검사선)의 항체는 '항원+금나노'만 붙잡아요. <strong>C선</strong>(대조선)은 금나노-항체를 그대로 붙잡아서, 시료가 끝까지 잘 흘렀는지 알려 줘요. <strong>C선이 안 보이면 무효</strong>예요.</p></div>
+  </div>
+  <p class="isum"><strong>정리</strong> · 시료는 종이를 따라 저절로 스며들어 이동해요(모세관 현상). 항원이 있으면 <strong>T선과 C선 두 줄</strong>, 없으면 <strong>C선 한 줄</strong>이 생겨요. 카본닷 키트는 금나노 대신 카본닷을 붙여서, 줄이 <strong>UV 빛을 비추면 빛나는 형광</strong>으로 보여요.</p>
+</details>
+</section>
+
+<!-- 금나노 -->
+<section class="exp" id="p-g" hidden>
+  <div class="col">
+    <div class="card scene"><div id="g-scene"></div></div>
+    <div class="msg" id="g-msg" data-kind="info">보안경을 쓰고 실험을 시작하세요.</div>
+  </div>
+  <div class="col">
+    <div class="card"><h3>도구 선반</h3><div class="tools" id="g-tools"></div></div>
+    <div class="card"><h3>실험 순서</h3><ol class="steps" id="g-steps"></ol></div>
+    <div class="card"><h3>실험 노트</h3><ul class="nb" id="g-log"></ul>
+      <div class="sub"><button type="button" class="pri" data-sub="g">선생님께 제출</button><button type="button" data-copy="g">노트 복사</button><button type="button" data-save="g">텍스트 파일로 저장</button><div class="subm" id="g-subm"></div></div></div>
+  </div>
+</section>
+
+<!-- 카본닷 -->
+<section class="exp" id="p-f" hidden>
+<details class="card intro" open>
+  <summary>카본닷은 왜 UV를 받으면 빛날까?</summary>
+  <span class="zhint">🔍 그림을 누르면 크게 볼 수 있어요</span>
+  <div class="ig" style="grid-template-columns:minmax(0,1fr)">
+    <div class="ib"><h4><b>1</b>빛은 색마다 에너지가 달라요</h4><svg class="fs" style="max-width:420px" viewBox="0 0 300 120" role="img" aria-label="자외선에서 빨간빛까지 파장과 에너지 크기를 비교한 빛 띠">
+  <defs><linearGradient id="vis" x1="0" x2="1"><stop offset="0" stop-color="#6A3FD0"/><stop offset=".2" stop-color="#3B6EF0"/><stop offset=".4" stop-color="#1FB5B0"/><stop offset=".55" stop-color="#5CC83A"/><stop offset=".7" stop-color="#F2D23A"/><stop offset=".85" stop-color="#F28A2E"/><stop offset="1" stop-color="#D93030"/></linearGradient>
+  <pattern id="uvp" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#ECE6F8"/><line x1="0" y1="0" x2="0" y2="6" stroke="#9A7FE0" stroke-width="2"/></pattern></defs>
+  <rect x="10" y="34" width="70" height="30" fill="url(#uvp)" stroke="#9A7FE0"/><rect x="80" y="34" width="210" height="30" fill="url(#vis)"/>
+  <text x="45" y="26" text-anchor="middle" style="font-weight:700;fill:#6A3FD0">자외선(UV)</text><text x="185" y="26" text-anchor="middle">눈에 보이는 빛 (가시광선)</text>
+  <text x="45" y="78" text-anchor="middle" class="mu">365 nm</text><text x="95" y="78" text-anchor="middle" class="mu">450</text><text x="170" y="78" text-anchor="middle" class="mu">530</text><text x="280" y="78" text-anchor="middle" class="mu">650 nm</text>
+  <line x1="280" y1="100" x2="16" y2="100" stroke="#B3263A" stroke-width="2" marker-end="url(#ea)"/>
+  <defs><marker id="ea" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#B3263A"/></marker></defs>
+  <text x="150" y="116" text-anchor="middle" style="fill:#B3263A;font-size:11px">← 파장이 짧을수록 에너지가 커요</text>
+</svg>
+      <p>빛은 에너지를 실어 나르는데, <strong>파장이 짧을수록 에너지가 커요.</strong> 자외선(UV)은 보라색보다도 파장이 짧아서 눈에는 안 보이지만 에너지가 아주 커요.</p></div>
+    <div class="ib"><h4><b>2</b>에너지 계단을 오르내리는 전자</h4>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <div class="optg"><span class="optl">비추는 빛</span>
+          <button type="button" class="tool" id="fl-uv" style="flex-direction:row;padding:4px 10px;font-size:13px">UV 365 nm</button>
+          <button type="button" class="tool" id="fl-gr" style="flex-direction:row;padding:4px 10px;font-size:13px">녹색 빛 530 nm</button></div>
+        <div class="optg"><span class="optl">시트르산 : 요소 몰비</span>
+          <button type="button" class="tool" id="fl-r1" style="flex-direction:row;padding:4px 10px;font-size:13px">1:1 (질소 적음)</button>
+          <button type="button" class="tool" id="fl-r5" style="flex-direction:row;padding:4px 10px;font-size:13px">1:5 (질소 많음)</button></div>
+        <button type="button" class="tool" id="fl-play" style="flex-direction:row;padding:4px 10px;font-size:13px">⏸ 움직임 멈추기</button>
+      </div>
+      <svg id="fl-svg" class="fs" style="max-width:720px" viewBox="0 0 640 250" role="img" aria-label="빛을 받은 카본닷의 전자가 에너지 계단을 올라갔다가 열로 일부 에너지를 잃고 내려오며 빛을 내는 움직이는 그림"></svg>
+      <p id="fl-cap" style="margin:0;font-size:15px;font-weight:600;min-height:3em"></p></div>
+  </div>
+  <div class="ig">
+    <div class="ib"><h4><b>3</b>왜 들어간 빛과 다른 색이 나올까?</h4>
+      <p>전자는 높은 계단에 올라간 뒤 바로 내려오지 않고, 먼저 <strong>에너지 일부를 진동(열)으로 잃어요.</strong> 그래서 내려올 때 내는 빛은 들어온 UV보다 에너지가 작아요. 즉 <strong>파장이 더 긴 빛</strong>이에요. 눈에 안 보이던 UV가 눈에 보이는 파란색·녹색 빛으로 바뀌어 나오는 거예요.</p>
+      <p class="key">비유: 공을 높은 선반에 던져 올렸는데, 내려올 때 몇 칸은 굴러서 힘이 빠지고 마지막에만 '퐁' 하고 튀어요.</p></div>
+    <div class="ib"><h4><b>4</b>왜 카본닷마다 색이 다를까?</h4>
+      <p>카본닷은 수 nm 크기의 아주 작은 탄소 조각이고, 표면에 <strong>산소·질소</strong>가 붙어 있어요. 이 <strong>크기와 표면 구조가 계단 간격</strong>을 정해요. 요소를 많이 넣어 질소가 많이 들어가면 계단 간격이 좁아져요. 그러면 내려올 때 나오는 빛의 에너지가 작아져서 파랑보다 <strong>녹색 쪽</strong> 빛이 나와요.</p>
+      <p class="key">2차시 A에서 1:1은 파란색, 1:5는 연두색으로 빛났던 이유예요.</p></div>
+    <div class="ib"><h4><b>5</b>형광과 비슷한 현상 구별하기</h4>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <tr style="border-bottom:1px solid var(--line)"><th style="text-align:left;padding:3px 4px"></th><th style="text-align:left;padding:3px 4px">빛을 끄면</th><th style="text-align:left;padding:3px 4px">예</th></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:3px 4px"><strong>형광</strong></td><td style="padding:3px 4px">바로 꺼짐</td><td style="padding:3px 4px">카본닷, 형광펜</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:3px 4px"><strong>인광</strong></td><td style="padding:3px 4px">한동안 빛남</td><td style="padding:3px 4px">야광 스티커</td></tr>
+        <tr><td style="padding:3px 4px"><strong>라만</strong></td><td style="padding:3px 4px">바로 꺼짐 (매우 약함)</td><td style="padding:3px 4px">3차시 SERS</td></tr></table>
+      <p class="key">형광은 라만보다 훨씬 밝아요. 그래서 3차시에서는 잎 엽록소의 형광이 라만 신호를 가리지 않도록 785 nm 레이저를 써요.</p></div>
+  </div>
+  <div class="ib" style="margin-top:12px"><h4><b>?</b>확인 문제 (눌러서 답 보기)</h4>
+    <details><summary style="cursor:pointer;font-size:14px;font-weight:600">① 카본닷에 녹색 빛(530 nm)을 비추면 왜 빛나지 않을까요?</summary><p style="margin:6px 0 0">녹색 빛은 에너지가 작아서 전자를 높은 계단까지 올려 주지 못해요. 흡수가 안 되니 내려오면서 낼 빛도 없어요.</p></details>
+    <details><summary style="cursor:pointer;font-size:14px;font-weight:600">② 카본닷이 내는 빛은 왜 UV보다 파장이 길까요?</summary><p style="margin:6px 0 0">높은 계단에 올라간 전자가 내려오기 전에 에너지 일부를 열(진동)로 잃기 때문이에요. 남은 에너지가 작으니 나오는 빛의 파장은 길어요.</p></details>
+    <details><summary style="cursor:pointer;font-size:14px;font-weight:600">③ 요소를 많이 넣은 카본닷이 녹색 쪽으로 빛나는 이유는?</summary><p style="margin:6px 0 0">질소가 많이 들어가 표면 구조가 바뀌면서 에너지 계단의 간격이 좁아졌기 때문이에요. 간격이 좁을수록 에너지가 작은 빛(긴 파장)이 나와요.</p></details>
+  </div>
+  <p class="isum"><strong>정리</strong> · 카본닷은 <strong>UV를 흡수</strong>해 전자가 높은 에너지 계단으로 올라가요(들뜬 상태). 그 뒤 <strong>열로 에너지를 조금 잃고</strong> 내려오면서 <strong>더 긴 파장의 빛</strong>(파란색·녹색)을 내요. 이것이 <strong>형광</strong>이에요. 계단 간격은 카본닷의 크기와 표면(질소)에 따라 달라서 색을 조절할 수 있어요. 카본닷의 형광 원리는 연구자들 사이에서도 아직 완전히 정리되지 않아서, 여기서는 수업용으로 단순화했어요.</p>
+</details>
+</section>
+
+<section class="exp" id="p-c" hidden>
+  <div class="col">
+    <div class="card scene"><div id="c-scene"></div></div>
+    <div class="msg" id="c-msg" data-kind="info">보안경을 쓰고 실험을 시작하세요.</div>
+    <p class="note" style="font-size:13px">※ 비율별 형광 색은 수업용으로 뚜렷하게 나타냈어요. 실제 실험에서는 색 차이가 시뮬레이션보다 작을 수 있어요.</p>
+  </div>
+  <div class="col">
+    <div class="card"><h3>도구 선반</h3><div class="tools" id="c-tools"></div></div>
+    <div class="card"><h3>실험 순서</h3><ol class="steps" id="c-steps"></ol></div>
+    <div class="card"><h3>실험 노트</h3><ul class="nb" id="c-log"></ul>
+      <div class="sub"><button type="button" class="pri" data-sub="c">선생님께 제출</button><button type="button" data-copy="c">노트 복사</button><button type="button" data-save="c">텍스트 파일로 저장</button><div class="subm" id="c-subm"></div></div></div>
+  </div>
+</section>
+
+<!-- 식물 SERS -->
+<section class="exp" id="p-r" hidden>
+  <details class="card intro" open>
+  <summary>라만 분석과 SERS는 무엇일까?</summary>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="zhint">🔍 그림을 누르면 크게 볼 수 있어요</span><button type="button" class="tool" id="intro-play" style="flex-direction:row;padding:4px 10px;font-size:13px">⏸ 움직임 멈추기</button></div>
+  <div class="ig ig2">
+    <div class="ib"><h4><b>1</b>빛이 물질을 만나면: 산란이란?</h4>
+      <p>빛이 물질을 만나면 흡수되거나, 그대로 투과하거나, 반사되거나, <strong>여러 방향으로 퍼져 나가요</strong>. 마지막을 <strong>산란</strong>이라고 해요. 실제로는 네 가지가 동시에 일부씩 일어나요. 유리창은 빛을 대부분 투과시키지만 일부를 반사해서, 밤에는 창문에 얼굴이 비쳐요.</p>
+      <svg class="fs fs4" viewBox="0 0 306 118" role="img" aria-label="빛이 물질을 만났을 때 네 가지 경우를 비교한 그림: 흡수는 빛이 물질 속에서 사라지고, 반사는 매끄러운 면에서 한 방향으로 되돌아가고, 투과는 물질을 그대로 지나가고, 산란은 작은 입자에서 사방으로 퍼짐">
+  <g><rect x="4" y="4" width="70" height="78" rx="6" style="fill:var(--bench)" /><rect x="38" y="20" width="28" height="48" rx="2" fill="#5E6670"/><defs><linearGradient id="fade" gradientUnits="userSpaceOnUse" x1="10" y1="0" x2="62" y2="0"><stop offset="0" stop-color="#F2B21B"/><stop offset="1" stop-color="#F2B21B" stop-opacity="0"/></linearGradient></defs><line x1="10" y1="44" x2="62" y2="44" stroke="url(#fade)" stroke-width="3.5"/>
+  <text x="39" y="98" text-anchor="middle" style="font-weight:700;font-size:11px">흡수</text>
+  <text x="39" y="112" text-anchor="middle" class="mu" style="font-size:9px">빛이 사라짐</text></g><g><rect x="80" y="4" width="70" height="78" rx="6" style="fill:var(--bench)" /><rect x="86" y="62" width="58" height="10" fill="#C9D3DE" stroke="#8C99A8"/><line x1="115" y1="20" x2="115" y2="62" style="stroke:var(--muted)" stroke-dasharray="2 2"/><g opacity="1"><line x1="90.0" y1="22.0" x2="113.2" y2="58.7" stroke="#F2B21B" stroke-width="3" stroke-linecap="round"/><path d="M106.7 56.3 L114.0 60.0 L113.8 51.8" fill="none" stroke="#F2B21B" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="116.0" y1="60.0" x2="139.2" y2="23.3" stroke="#F2B21B" stroke-width="3" stroke-linecap="round"/><path d="M139.8 30.2 L140.0 22.0 L132.7 25.7" fill="none" stroke="#F2B21B" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></g>
+  <text x="115" y="98" text-anchor="middle" style="font-weight:700;font-size:11px">반사</text>
+  <text x="115" y="112" text-anchor="middle" class="mu" style="font-size:9px">한 방향으로</text></g><g><rect x="156" y="4" width="70" height="78" rx="6" style="fill:var(--bench)" /><rect x="182" y="16" width="18" height="56" rx="2" fill="#C9D3DE" stroke="#8C99A8" opacity=".7"/><g opacity="1"><line x1="162.0" y1="44.0" x2="218.5" y2="44.0" stroke="#F2B21B" stroke-width="3" stroke-linecap="round"/><path d="M213.0 48.2 L220.0 44.0 L213.0 39.8" fill="none" stroke="#F2B21B" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></g>
+  <text x="191" y="98" text-anchor="middle" style="font-weight:700;font-size:11px">투과</text>
+  <text x="191" y="112" text-anchor="middle" class="mu" style="font-size:9px">그대로 통과</text></g><g><rect x="232" y="4" width="70" height="78" rx="6" style="fill:var(--bench)" /><circle cx="267" cy="44" r="6" fill="#7C838C"/><g opacity="1"><line x1="236.0" y1="44.0" x2="256.5" y2="44.0" stroke="#F2B21B" stroke-width="3" stroke-linecap="round"/><path d="M252.0 47.6 L258.0 44.0 L252.0 40.4" fill="none" stroke="#F2B21B" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="277.0" y1="44.0" x2="291.5" y2="44.0" stroke="#F2B21B" stroke-width="2" stroke-linecap="round"/><path d="M289.0 46.4 L293.0 44.0 L289.0 41.6" fill="none" stroke="#F2B21B" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="274.1" y1="36.9" x2="284.3" y2="26.7" stroke="#F2B21B" stroke-width="2" stroke-linecap="round"/><path d="M284.3 30.1 L285.4 25.6 L280.9 26.7" fill="none" stroke="#F2B21B" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="267.0" y1="34.0" x2="267.0" y2="19.5" stroke="#F2B21B" stroke-width="2" stroke-linecap="round"/><path d="M269.4 22.0 L267.0 18.0 L264.6 22.0" fill="none" stroke="#F2B21B" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="259.9" y1="36.9" x2="249.7" y2="26.7" stroke="#F2B21B" stroke-width="2" stroke-linecap="round"/><path d="M253.1 26.7 L248.6 25.6 L249.7 30.1" fill="none" stroke="#F2B21B" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="259.9" y1="51.1" x2="249.7" y2="61.3" stroke="#F2B21B" stroke-width="2" stroke-linecap="round"/><path d="M249.7 57.9 L248.6 62.4 L253.1 61.3" fill="none" stroke="#F2B21B" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="267.0" y1="54.0" x2="267.0" y2="68.5" stroke="#F2B21B" stroke-width="2" stroke-linecap="round"/><path d="M264.6 66.0 L267.0 70.0 L269.4 66.0" fill="none" stroke="#F2B21B" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="274.1" y1="51.1" x2="284.3" y2="61.3" stroke="#F2B21B" stroke-width="2" stroke-linecap="round"/><path d="M280.9 61.3 L285.4 62.4 L284.3 57.9" fill="none" stroke="#F2B21B" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g>
+  <text x="267" y="98" text-anchor="middle" style="font-weight:700;font-size:11px">산란</text>
+  <text x="267" y="112" text-anchor="middle" class="mu" style="font-size:9px">사방으로 퍼짐</text></g>
+</svg>
+      <p><strong>반사와 산란의 차이</strong> · 둘 다 빛이 흡수되지 않고 다시 나가는 현상이에요. 다른 점은 <strong>나가는 방향</strong>이에요. 매끄러운 표면에서는 빛이 들어온 각도와 같은 각도로 <strong>한 방향</strong>으로 반사되고, 분자처럼 아주 작은 입자를 만나면 <strong>사방</strong>으로 퍼져요.</p>
+      <svg class="fs fs2" viewBox="0 0 306 136" role="img" aria-label="반사와 산란 비교: 매끄러운 표면에서는 빛이 들어온 각도와 같은 각도로 한 방향으로 반사되고, 아주 작은 입자에서는 빛이 사방으로 퍼져 산란되는 그림">
+  <rect x="10" y="104" width="130" height="12" fill="#C9D3DE" stroke="#8C99A8"/><text x="75" y="129" text-anchor="middle" class="mu" style="font-size:10px">매끄러운 표면</text>
+  <line x1="75" y1="30" x2="75" y2="104" style="stroke:var(--muted)" stroke-dasharray="3 3"/>
+  <g opacity="1"><line x1="22.0" y1="40.0" x2="72.0" y2="100.8" stroke="#F2B21B" stroke-width="3.5" stroke-linecap="round"/><path d="M65.3 99.3 L73.0 102.0 L71.8 93.9" fill="none" stroke="#F2B21B" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="77.0" y1="102.0" x2="127.0" y2="41.2" stroke="#F2B21B" stroke-width="3.5" stroke-linecap="round"/><path d="M126.8 48.1 L128.0 40.0 L120.3 42.7" fill="none" stroke="#F2B21B" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g>
+  <path d="M62 86 A18 18 0 0 1 75 84" fill="none" style="stroke:var(--muted)"/><path d="M75 84 A18 18 0 0 1 88 86" fill="none" style="stroke:var(--muted)"/>
+  <text x="75" y="70" text-anchor="middle" class="mu" style="font-size:9px">같은 각도</text>
+  <text x="75" y="18" text-anchor="middle" style="font-weight:700">반사</text><line x1="153" y1="10" x2="153" y2="128" style="stroke:var(--line)"/><g opacity="1"><line x1="160.0" y1="70.0" x2="218.5" y2="70.0" stroke="#F2B21B" stroke-width="3.5" stroke-linecap="round"/><path d="M213.0 74.2 L220.0 70.0 L213.0 65.8" fill="none" stroke="#F2B21B" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="0.4"><line x1="244.0" y1="70.0" x2="298.5" y2="70.0" stroke="#F2B21B" stroke-width="3.5" stroke-linecap="round"/><path d="M293.0 74.2 L300.0 70.0 L293.0 65.8" fill="none" stroke="#F2B21B" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="241.9" y1="60.1" x2="260.6" y2="41.4" stroke="#F2B21B" stroke-width="2.2" stroke-linecap="round"/><path d="M260.3 46.0 L261.7 40.3 L256.0 41.7" fill="none" stroke="#F2B21B" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="232.0" y1="56.0" x2="232.0" y2="29.5" stroke="#F2B21B" stroke-width="2.2" stroke-linecap="round"/><path d="M235.0 33.0 L232.0 28.0 L229.0 33.0" fill="none" stroke="#F2B21B" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="222.1" y1="60.1" x2="203.4" y2="41.4" stroke="#F2B21B" stroke-width="2.2" stroke-linecap="round"/><path d="M208.0 41.7 L202.3 40.3 L203.7 46.0" fill="none" stroke="#F2B21B" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="222.1" y1="79.9" x2="203.4" y2="98.6" stroke="#F2B21B" stroke-width="2.2" stroke-linecap="round"/><path d="M203.7 94.0 L202.3 99.7 L208.0 98.3" fill="none" stroke="#F2B21B" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="232.0" y1="84.0" x2="232.0" y2="110.5" stroke="#F2B21B" stroke-width="2.2" stroke-linecap="round"/><path d="M229.0 107.0 L232.0 112.0 L235.0 107.0" fill="none" stroke="#F2B21B" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></g><g opacity="1"><line x1="241.9" y1="79.9" x2="260.6" y2="98.6" stroke="#F2B21B" stroke-width="2.2" stroke-linecap="round"/><path d="M256.0 98.3 L261.7 99.7 L260.3 94.0" fill="none" stroke="#F2B21B" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></g>
+  <circle cx="232" cy="70" r="8" fill="#7C838C"/><circle cx="229" cy="67" r="2.5" fill="#B7BDC4"/>
+  <text x="232" y="129" text-anchor="middle" class="mu" style="font-size:10px">아주 작은 입자(분자)</text>
+  <text x="232" y="18" text-anchor="middle" style="font-weight:700">산란</text>
+</svg>
+      <p class="key">SERS 센서는 금속 표면이지만, 우리가 재는 신호는 금속에서 반사된 빛이 아니라 <strong>분자에서 산란된 빛</strong>이에요.</p>
+      <p><strong>산란은 어떻게 일어날까?</strong> · 빛은 <strong>전기장이 진동하며 나아가는 파동</strong>(전자기파)이에요. 전기장이 위를 향하면 (−)전하인 전자구름은 반대쪽인 아래로 밀리고, 전기장이 아래를 향하면 위로 밀려요. 그래서 빛이 지나가는 동안 분자의 <strong>전자구름이 위아래로 흔들려요</strong>(예를 들어 녹색 빛은 1초에 약 560조 번 진동). 흔들리는 전자구름은 작은 안테나처럼 <strong>들어온 빛과 같은 색의 빛을 사방으로 다시 내보내요</strong>. 이것이 <strong>산란</strong>이에요.</p>
+      <p class="key" style="font-size:15px;color:var(--fg)"><strong>생활 속 산란</strong> · 하늘이 파랗게 보이는 것, 안개나 콜로이드 용액에 레이저를 비추면 빛이 지나가는 길이 보이는 것(틴들 현상), 노을이 붉게 보이는 것</p></div>
+    <div class="ib"><h4><b>2</b>레일리 산란과 라만 산란</h4><div class="ramfig">
+        <figure class="rf"><figcaption><b style="color:#2BB24C">레일리 산란</b><span>탄성 산란 · 바닥 상태로 돌아옴</span></figcaption><svg viewBox="0 0 200 182" role="img" aria-label="레일리 산란 정지 그림: 레이저 빛이 분자를 가상 상태로 올리고, 분자가 바닥 상태로 돌아오며 같은 에너지의 빛이 나감">
+  <text x="2" y="12" class="mu" style="font-size:10.5px">↑ 에너지</text>
+  <line x1="44" y1="24" x2="150" y2="24" style="stroke:var(--fg)" stroke-width="1.8"/><text x="152" y="28" class="mu" style="font-size:10.5px">전자 들뜬</text><text x="152" y="39" class="mu" style="font-size:10.5px">상태</text>
+  <line x1="44" y1="56" x2="150" y2="56" style="stroke:var(--fg)" stroke-width="1.8" stroke-dasharray="5 3"/><text x="152" y="60" style="font-size:11px">가상</text><text x="152" y="71" style="font-size:11px">상태</text>
+  <line x1="44" y1="132" x2="150" y2="132" style="stroke:var(--fg)" stroke-width="1.6" opacity=".45"/>
+  <line x1="44" y1="146" x2="150" y2="146" style="stroke:var(--fg)" stroke-width="1.8"/><text x="152" y="150" class="mu" style="font-size:11px">v=1</text>
+  <line x1="44" y1="160" x2="150" y2="160" style="stroke:var(--fg)" stroke-width="2.2"/><text x="152" y="164" style="font-size:11px">바닥</text>
+  <text x="97" y="177" text-anchor="middle" class="mu" style="font-size:10.5px">진동 에너지 준위</text>
+  <path d="M2.0 98.0 L3.2 102.5 L4.5 102.0 L5.7 97.1 L6.9 93.2 L8.2 94.6 L9.4 99.7 L10.6 103.0 L11.8 100.8 L13.1 95.5 L14.3 93.0 L15.5 96.0 L16.8 101.2 L18.0 102.9 L19.2 99.2 L20.5 94.2 L21.7 93.4 L22.9 97.7 L24.2 102.3 L25.4 102.2 L26.6 97.5 L27.8 93.3 L29.1 94.3 L30.3 99.4 L31.5 102.9 L32.8 101.0 L34.0 95.8" fill="none" stroke="#2BB24C" stroke-width="2"/><path d="M30 93 L37 98 L30 103" fill="none" stroke="#2BB24C" stroke-width="2"/>
+  <text x="2" y="84" style="fill:#2BB24C;font-size:11px">레이저</text>
+  <line x1="56" y1="160" x2="56" y2="61" stroke="#2BB24C" stroke-width="3.5"/><path d="M51 65 L56 56 L61 65" fill="none" stroke="#2BB24C" stroke-width="2.6"/>
+  <line x1="132" y1="56" x2="132" y2="155" stroke="#2BB24C" stroke-width="3.5"/><path d="M127 151 L132 160 L137 151" fill="none" stroke="#2BB24C" stroke-width="2.6"/>
+  
+  <path d="M158.0 92.0 L159.2 96.4 L160.4 96.1 L161.6 91.4 L162.9 87.3 L164.1 88.3 L165.3 93.3 L166.5 96.9 L167.7 95.2 L168.9 90.1 L170.1 87.0 L171.4 89.3 L172.6 94.5 L173.8 97.0 L175.0 94.2 L176.2 89.0 L177.4 87.1 L178.6 90.4 L179.9 95.5 L181.1 96.8 L182.3 93.0 L183.5 88.1 L184.7 87.4 L185.9 91.7 L187.1 96.3 L188.4 96.3 L189.6 91.7 L190.8 87.4 L192.0 88.1" fill="none" stroke="#2BB24C" stroke-width="2"/><path d="M188 87 L195 92 L188 97" fill="none" stroke="#2BB24C" stroke-width="2"/>
+  <text x="198" y="112" text-anchor="end" style="fill:#2BB24C;font-size:10px">에너지 그대로</text><text x="198" y="124" text-anchor="end" class="mu" style="font-size:10px">같은 색</text>
+</svg></figure>
+        <figure class="rf"><figcaption><b style="color:#5E8A00">라만 산란 <span style="font-size:.8em;color:inherit;font-weight:600">(스토크스 라만)</span></b><span>비탄성 산란 · v=1로 내려옴</span></figcaption><svg viewBox="0 0 200 182" role="img" aria-label="스토크스 라만 산란 정지 그림: 레이저 빛이 분자를 가상 상태로 올리고, 분자가 한 칸 위 진동 준위로 내려오며 에너지가 조금 줄어든 연두빛이 나감">
+  <text x="2" y="12" class="mu" style="font-size:10.5px">↑ 에너지</text>
+  <line x1="44" y1="24" x2="150" y2="24" style="stroke:var(--fg)" stroke-width="1.8"/><text x="152" y="28" class="mu" style="font-size:10.5px">전자 들뜬</text><text x="152" y="39" class="mu" style="font-size:10.5px">상태</text>
+  <line x1="44" y1="56" x2="150" y2="56" style="stroke:var(--fg)" stroke-width="1.8" stroke-dasharray="5 3"/><text x="152" y="60" style="font-size:11px">가상</text><text x="152" y="71" style="font-size:11px">상태</text>
+  <line x1="44" y1="132" x2="150" y2="132" style="stroke:var(--fg)" stroke-width="1.6" opacity=".45"/>
+  <line x1="44" y1="146" x2="150" y2="146" style="stroke:var(--fg)" stroke-width="1.8"/><text x="152" y="150" class="mu" style="font-size:11px">v=1</text>
+  <line x1="44" y1="160" x2="150" y2="160" style="stroke:var(--fg)" stroke-width="2.2"/><text x="152" y="164" style="font-size:11px">바닥</text>
+  <text x="97" y="177" text-anchor="middle" class="mu" style="font-size:10.5px">진동 에너지 준위</text>
+  <path d="M2.0 98.0 L3.2 102.5 L4.5 102.0 L5.7 97.1 L6.9 93.2 L8.2 94.6 L9.4 99.7 L10.6 103.0 L11.8 100.8 L13.1 95.5 L14.3 93.0 L15.5 96.0 L16.8 101.2 L18.0 102.9 L19.2 99.2 L20.5 94.2 L21.7 93.4 L22.9 97.7 L24.2 102.3 L25.4 102.2 L26.6 97.5 L27.8 93.3 L29.1 94.3 L30.3 99.4 L31.5 102.9 L32.8 101.0 L34.0 95.8" fill="none" stroke="#2BB24C" stroke-width="2"/><path d="M30 93 L37 98 L30 103" fill="none" stroke="#2BB24C" stroke-width="2"/>
+  <text x="2" y="84" style="fill:#2BB24C;font-size:11px">레이저</text>
+  <line x1="56" y1="160" x2="56" y2="61" stroke="#2BB24C" stroke-width="3.5"/><path d="M51 65 L56 56 L61 65" fill="none" stroke="#2BB24C" stroke-width="2.6"/>
+  <line x1="132" y1="56" x2="132" y2="141" stroke="#8DBA1F" stroke-width="3.5"/><path d="M127 137 L132 146 L137 137" fill="none" stroke="#8DBA1F" stroke-width="2.6"/>
+  <path d="M126 146 L120 146 L120 160 L126 160" fill="none" style="stroke:var(--fg)" stroke-width="1.4"/><text x="117" y="157" text-anchor="end" style="font-size:10.5px">진동 에너지</text>
+  <path d="M158.0 92.0 L159.2 95.7 L160.4 97.0 L161.6 94.8 L162.9 90.8 L164.1 87.6 L165.3 87.3 L166.5 90.3 L167.7 94.4 L168.9 96.9 L170.1 96.1 L171.4 92.5 L172.6 88.6 L173.8 87.0 L175.0 88.8 L176.2 92.7 L177.4 96.2 L178.6 96.8 L179.9 94.2 L181.1 90.1 L182.3 87.3 L183.5 87.7 L184.7 91.0 L185.9 95.0 L187.1 97.0 L188.4 95.6 L189.6 91.8 L190.8 88.1 L192.0 87.1" fill="none" stroke="#8DBA1F" stroke-width="2"/><path d="M188 87 L195 92 L188 97" fill="none" stroke="#8DBA1F" stroke-width="2"/>
+  <text x="198" y="112" text-anchor="end" style="fill:#5E8A00;font-size:10px">에너지 줄어듦</text><text x="198" y="124" text-anchor="end" class="mu" style="font-size:10px">파장 조금</text><text x="198" y="135" text-anchor="end" class="mu" style="font-size:10px">길어짐</text>
+</svg></figure>
+      </div>
+      <p class="key" style="margin-top:6px">그림은 532 nm 녹색 레이저를 예로 들었어요. 라만 산란된 빛은 레이저보다 파장이 아주 조금 길어져서(예: 살리실산 → 약 563 nm, 연두빛) <strong>빨간빛으로 바뀌는 것이 아니에요</strong>. 색 차이가 작아서 눈이 아니라 분광기로 구분해요.</p>
+      <p>들어온 빛(녹색 화살표)은 분자를 <strong>가상 상태</strong>로 잠깐 끌어올려요. 가상 상태는 실제 에너지 준위가 아니에요. 빛과 분자가 아주 짧은 순간(10⁻¹⁴초 정도) 함께 만드는 임시 상태라서, 빛을 흡수했다가 한참 뒤에 내놓는 <strong>형광(2차시 B)과 달라요</strong>.</p>
+      <p>· 거의 모든 경우 분자는 <strong>원래 바닥 상태</strong>로 돌아와요. 나가는 빛의 에너지가 들어온 빛과 같아요 → <strong>레일리 산란</strong>(탄성 산란)<br>
+      · 아주 드물게(산란되는 빛 약 1000만 개 중 1개) 분자가 <strong>한 칸 위 진동 준위</strong>에 내려앉아요. 나가는 빛은 진동 에너지만큼 에너지를 잃어요 → <strong>스토크스 라만 산란</strong>(비탄성 산란)</p>
+      <p class="key">라만 빛의 에너지 = 레이저 빛의 에너지 − 분자 진동 에너지. 빛의 에너지가 작아지면 파장이 길어져요(그림에서 연두 물결이 조금 더 느슨해요). 반대로 이미 진동하던 분자에서 에너지를 얻어 오는 '안티-스토크스' 산란도 있지만 더 드물어서 보통 스토크스 쪽을 측정해요.</p></div>
+    <div class="ib"><h4><b>3</b>분자마다 다른 '지문'</h4><svg class="fs3" viewBox="0 0 260 150" role="img" aria-label="분자마다 봉우리 위치가 다른 라만 스펙트럼 예시">
+  <line x1="20" y1="118" x2="252" y2="118" stroke="#9AA0A8"/><line x1="20" y1="10" x2="20" y2="118" stroke="#9AA0A8"/>
+  <path d="M20 112 L60 112 L66 72 L72 112 L120 112 L126 92 L132 112 L190 112 L196 60 L202 112 L252 112" fill="none" stroke="#E07B24" stroke-width="2"/>
+  <path d="M20 116 L84 116 L90 50 L96 116 L150 116 L156 86 L162 116 L252 116" fill="none" stroke="#1FA67A" stroke-width="2"/>
+  <text x="200" y="40" style="fill:#E07B24">분자 A</text><text x="98" y="44" style="fill:#1FA67A">분자 B</text>
+  <text x="136" y="136" text-anchor="middle" class="mu">라만 이동 (cm⁻¹) → 빛이 잃은 에너지</text>
+  <text x="14" y="64" text-anchor="middle" class="mu" transform="rotate(-90 14 64)">세기</text>
+</svg>
+      <p>분자는 원자의 종류와 결합 방식에 따라 <strong>진동하는 방식이 달라요.</strong> 그래서 빛이 잃는 에너지(라만 이동)도 분자마다 달라요. 봉우리가 나타나는 <strong>위치</strong>를 보면 어떤 분자인지 알 수 있어요. 그래서 라만 스펙트럼을 '분자의 지문'이라고 불러요.</p>
+      <p class="key">이번 실험: 살리실산은 1035 cm⁻¹, ATP는 729 cm⁻¹에서 봉우리가 나타나요.</p></div>
+    <div class="ib"><h4><b>4</b>SERS: 금속 나노입자로 신호 키우기</h4><svg viewBox="0 0 324 146" role="img" aria-label="금 나노입자 하나는 양 끝이 밝고, 두 입자가 아주 가까이 있으면 틈이 가장 밝은 핫스팟이 되며, 핫스팟에 붙은 분자의 라만 신호가 약 천만 배 커지는 것을 나타낸 그림">
+  <defs><radialGradient id="hot2"><stop offset="0" stop-color="#FFE45C"/><stop offset=".45" stop-color="#F0602A" stop-opacity=".85"/><stop offset="1" stop-color="#F0602A" stop-opacity="0"/></radialGradient>
+  <radialGradient id="core2"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FFF6B0" stop-opacity="0"/></radialGradient></defs>
+  <text x="54" y="14" text-anchor="middle" style="font-size:11px;font-weight:700">① 입자 하나</text>
+  <rect x="4" y="22" width="100" height="88" rx="6" fill="#0E1B3D"/><g clip-path="url(#k4)"><ellipse cx="30" cy="66" rx="16" ry="22" fill="url(#hot2)" opacity="1"/><ellipse cx="78" cy="66" rx="16" ry="22" fill="url(#hot2)" opacity="1"/><circle cx="54" cy="66" r="20" fill="#1B2A55" stroke="#E2B33C" stroke-width="1.5"/></g><clipPath id="k4"><rect x="4" y="22" width="100" height="88" rx="6"/></clipPath>
+  
+  <text x="162" y="14" text-anchor="middle" style="font-size:11px;font-weight:700">② 두 입자 사이 틈</text>
+  <rect x="112" y="22" width="100" height="88" rx="6" fill="#0E1B3D"/><g clip-path="url(#k112)"><ellipse cx="121" cy="66" rx="10" ry="16" fill="url(#hot2)" opacity="0.55"/><ellipse cx="203" cy="66" rx="10" ry="16" fill="url(#hot2)" opacity="0.55"/><ellipse cx="162" cy="66" rx="9" ry="24" fill="url(#hot2)" opacity="1"/><ellipse cx="162" cy="66" rx="4" ry="12" fill="url(#core2)" opacity="1"/><circle cx="141" cy="66" r="19" fill="#1B2A55" stroke="#E2B33C" stroke-width="1.5"/><circle cx="183" cy="66" r="19" fill="#1B2A55" stroke="#E2B33C" stroke-width="1.5"/><circle cx="162" cy="66" r="2.6" fill="#E84A5F"/></g><clipPath id="k112"><rect x="112" y="22" width="100" height="88" rx="6"/></clipPath>
+  
+  <text x="162" y="40" text-anchor="middle" style="font-size:9.5px;fill:#fff;font-weight:700">핫스팟</text>
+  
+  <text x="272" y="14" text-anchor="middle" style="font-size:11px;font-weight:700">③ 라만 신호 크기</text>
+  <rect x="236" y="108" width="22" height="2" fill="#9AA0A8"/><text x="247" y="124" text-anchor="middle" style="font-size:10px">보통</text>
+  <rect x="280" y="28" width="22" height="82" fill="#A8741A"/><text x="291" y="124" text-anchor="middle" style="font-size:10px">SERS</text>
+  <text x="291" y="42" text-anchor="middle" style="fill:#fff;font-size:10px">×10⁷</text>
+  <text x="108" y="138" text-anchor="middle" class="mu" style="font-size:9.5px">주황·노란색: 전기장이 강해진 곳 (노란색일수록 더 강함)</text>
+</svg>
+      <p><strong>① 전자의 공명 (LSPR)</strong> · 금속에는 자유롭게 움직이는 <strong>자유 전자</strong>가 많아요. 빛을 받으면 나노입자 속 자유 전자들이 다 같이 진동하고, 전자들이 진동하기 쉬운 진동수와 빛의 진동수가 맞으면 아주 크게 진동해요. 이것을 <strong>국소 표면 플라스몬 공명(LSPR)</strong>이라고 해요. 금 나노입자는 녹색 빛과 진동수가 맞아서 녹색 빛을 흡수해요. 그래서 금나노 용액이 붉게 보여요.</p>
+      <p><strong>② 핫스팟</strong> · 전자가 한쪽으로 몰리면 입자 양 끝에 강한 전기장이 생겨요. 두 입자가 아주 가까우면 그 <strong>틈</strong>에서 전기장이 훨씬 강해지는데, 이곳이 <strong>핫스팟</strong>이에요. 틈이 좁을수록 강해요.</p>
+      <p><strong>③ SERS</strong> · 라만 신호는 아주 약하지만, 핫스팟에 붙은 분자(그림의 빨간 점)의 라만 신호는 <strong>수백만~수천만 배</strong> 커져요. 이것이 <strong>표면증강 라만 산란(SERS)</strong>이에요.</p>
+      <p class="key">이번 실험의 센서는 은 나노셸이고, 신호를 약 3천만 배(2.9×10⁷) 키워요.</p></div>
+  </div>
+  <div class="miscon"><h4>그림을 볼 때 주의할 점 · 꼭 알아 둘 오개념 3가지</h4><ul>
+    <li><span class="x">✗ 산란은 빛이 분자에 흡수되었다가 다시 나오는 것이다.</span><span class="o">✓ 산란에서는 빛이 흡수되지 않아요. 빛의 전기장이 전자구름을 흔들고, 흔들린 전자구름이 곧바로 빛을 다시 내보내요. 빛을 흡수했다가 나중에 내놓는 형광과는 다른 현상이에요.</span></li>
+    <li><span class="x">✗ 에너지 준위 그림의 화살표는 빛이 진행하는 방향이다.</span><span class="o">✓ 위·아래 화살표는 분자의 <strong>에너지 변화</strong>만 나타내요. 실제로 레일리 빛과 라만 빛은 모두 사방으로 퍼지고, 방향이 아니라 <strong>에너지(파장)</strong>로 구분해요.</span></li>
+    <li><span class="x">✗ 라만 산란이 일어나면 색이 눈에 띄게 바뀐다.</span><span class="o">✓ 바뀌는 정도는 작아서 분광기로 재야 해요. 이번 실험의 785 nm 레이저는 라만 빛도 근적외선(약 850 nm)이라 눈에 보이지 않아요. 그림의 녹색·연두색은 532 nm 녹색 레이저를 예로 들었을 때의 색이에요.</span></li>
+  </ul></div>
+  <p class="isum"><strong>정리</strong> · 병원균에 감염된 식물은 몸을 지키려고 <strong>살리실산·ATP 같은 신호 분자</strong>를 만들어요. 잎은 아직 초록색이라도요. 잎 속에 SERS 센서를 넣고 레이저를 비추면 이 분자들의 '지문'을 찾아 <strong>병을 일찍 진단</strong>할 수 있어요. 다음 탭(3차시 B)의 온실에서 직접 찾아보세요!</p>
+</details>
+</section>
+
+<section class="exp" id="p-p" hidden>
+  <div class="col">
+    <div class="card scene"><div id="p-scene"></div></div>
+    <div class="card scene"><h3>SERS 스펙트럼 (785 nm)</h3><div id="p-spec"></div><p class="note" style="font-size:10.5px;line-height:1.45">봉우리 위치 출처: Son, W. K. … Jeong, D. H., Kwak, S.-Y. In vivo surface-enhanced Raman scattering nanosensor for the real-time monitoring of multiple stress signalling molecules in plants. <i>Nature Nanotechnology</i> 18, 205–216 (2023), 서울대 정대홍·곽선영 교수 연구팀. 봉우리 세기와 잡음은 수업용으로 단순화한 모식 값이에요.</p></div>
+    <div class="msg" id="p-msg" data-kind="info">온실의 보리는 모두 건강해 보입니다. 그런데 두 그루는 붉은곰팡이(<i>F. graminearum</i>)에 막 감염됐어요. 겉모습으로는 알 수 없어요. 보리를 하나 골라 보세요.</div>
+  </div>
+  <div class="col">
+    <div class="card"><h3>도구 선반</h3><div class="tools" id="p-tools"></div></div>
+    <div class="card"><h3>실험 순서</h3><ol class="steps" id="p-steps"></ol></div>
+    <div class="card"><h3>실험 노트</h3><ul class="nb" id="p-log"></ul>
+      <div class="sub"><button type="button" class="pri" data-sub="p">선생님께 제출</button><button type="button" data-copy="p">노트 복사</button><button type="button" data-save="p">텍스트 파일로 저장</button><div class="subm" id="p-subm"></div></div></div>
+  </div>
+</section>
+<footer class="credit">
+  <p>제작: 조원고등학교 교사 신예진</p>
+  <p>© 2026 Yejin Shin. All rights reserved.</p>
+</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const rgb=a=>`rgb(${a.map(v=>Math.round(v)).join(",")})`;
+const lerp=(a,b,k)=>a.map((v,i)=>v+(b[i]-v)*k);
+
+/* ---------- 공통 틀 ---------- */
+function Exp(key,steps){
+  const o={done:new Set()};
+  o.renderSteps=()=>{const nx=steps.find(s=>!o.done.has(s[0]));
+    $(key+"-steps").innerHTML=steps.map(([k,t])=>`<li class="${o.done.has(k)?"ok":(nx&&nx[0]===k?"now":"")}">${t}</li>`).join("");};
+  o.step=k=>{if(!o.done.has(k)){o.done.add(k);o.renderSteps();}};
+  o.unstep=ks=>{ks.forEach(k=>o.done.delete(k));o.renderSteps();};
+  o.say=(t,kind="info")=>{const m=$(key+"-msg");m.textContent=t;m.dataset.kind=kind;};
+  o.log=t=>{const li=document.createElement("li");li.textContent=t;$(key+"-log").prepend(li);};
+  o.renderSteps();return o;
+}
+function seg(id,label,opts,init,onSet){
+  return {html:`<div class="seg" id="${id}"><span>${label}</span><div>${opts.map(([v,t])=>`<button data-v="${v}" aria-pressed="${String(v)===String(init)}">${t}</button>`).join("")}</div></div>`,
+    bind:()=>$(id).querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      if(onSet(b.dataset.v)===false) return;
+      $(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));})};
+}
+function setSeg(id,v){$(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===String(v)));}
+function tools(key,list){
+  $(key+"-tools").innerHTML=list.map(t=>t.html||`<button class="tool ${t.cls||""}" id="${t.id}"><b>${t.label}</b>${t.sub?`<small>${t.sub}</small>`:""}</button>`).join("");
+  list.forEach(t=>{if(t.fn)$(t.id).onclick=t.fn;if(t.bind)t.bind();});
+}
+/* 선택(seg)과 실행 버튼을 한 상자로 묶어 위계를 보여 주는 묶음 */
+const btnHTML=t=>`<button class="tool ${t.cls||""}" id="${t.id}"><b>${t.label}</b>${t.sub?`<small>${t.sub}</small>`:""}</button>`;
+function group(items){return {html:`<div class="grp">${items.map(t=>t.html||btnHTML(t)).join("")}</div>`,
+  bind:()=>items.forEach(t=>{if(t.fn)$(t.id).onclick=t.fn;if(t.bind)t.bind();})};}
+const SVG=(vb,body)=>`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="실험대">${body}</svg>`;
+const GLOW=`<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+
+/* ---------- 탭 ---------- */
+const TABS=["k","l","g","c","f","r","p"];
+const SESS={"1":["k","l","g"],"2":["c","f"],"3":["r","p"]};
+function setOpen(s,open){$("acts").hidden=!open;
+  document.querySelectorAll(".sess").forEach(b=>b.setAttribute("aria-expanded",open&&b.dataset.sess===s));
+  const b=document.querySelector('.sess[data-sess="'+s+'"]'),nav=$("acts");
+  if(open&&b)nav.style.setProperty("--ax",(b.offsetLeft+b.offsetWidth/2-nav.offsetLeft)+"px");}
+function show(key){const s=Object.keys(SESS).find(n=>SESS[n].includes(key));
+  document.querySelectorAll(".sess").forEach(b=>b.setAttribute("aria-pressed",b.dataset.sess===s));
+  TABS.forEach(t=>{const b=$("tab-"+t);b.hidden=!SESS[s].includes(t);b.setAttribute("aria-selected",t===key);$("p-"+t).hidden=t!==key;});RENDER[key]();}
+TABS.forEach(t=>$("tab-"+t).onclick=()=>show(t));
+document.querySelectorAll(".sess").forEach(b=>b.onclick=()=>{const s=b.dataset.sess;
+  if(b.getAttribute("aria-pressed")==="true"){setOpen(s,$("acts").hidden);return;}  // 같은 차시를 다시 누르면 상자 열기/닫기
+  show(SESS[s][0]);setOpen(s,true);});
+setOpen("1",true);
+window.addEventListener("resize",()=>{if(!$("acts").hidden){const b=document.querySelector('.sess[aria-pressed="true"]');setOpen(b.dataset.sess,true);}});
+
+/* ======================================================
+   1. 신속항원검사
+   ====================================================== */
+const PTS={A:{name:"환자 A",desc:"기침 시작 1일째",lv:4.6,inf:true},B:{name:"환자 B",desc:"증상 3일째",lv:6.6,inf:true},C:{name:"환자 C",desc:"증상 없음",lv:0,inf:false}};
+const LOD={gold:5.5,cd:4.0};
+const KN={gold:"금나노 키트",cd:"카본닷 키트"};
+const K=Exp("k",[["pt","환자와 키트 종류를 고른다"],["swab","면봉으로 콧속 검체를 채취한다"],["swirl","추출액 튜브에 면봉을 10번 돌린다"],
+  ["drop","키트 시료창에 3방울 떨어뜨린다"],["wait","15분 기다린다"],["read","결과를 판독한다 (카본닷 키트는 UV 판독기 필요)"],["cmp","다른 환자, 다른 키트로 반복해 결과표를 채운다"]]);
+let k={pt:null,type:"gold",swab:false,swirl:0,drops:0,wait:0,run:false,uv:false,judged:false},kRes={};
+const kFlow=()=>k.drops>=2;
+function kT(){if(!k.pt)return 0;let v=1/(1+Math.exp(-(PTS[k.pt].lv-LOD[k.type])*4));if(k.drops===2)v*=.6;return v<.05?0:v;}
+const kTruth=()=>!kFlow()?"무효":kT()>.15?"양성":"음성";
+function kNew(){k={pt:k.pt,type:k.type,swab:false,swirl:0,drops:0,wait:0,run:false,uv:false,judged:false};K.unstep(["swab","swirl","drop","wait","read"]);}
+tools("k",[
+  seg("k-pt","환자 고르기",["A","B","C"].map(p=>[p,`${PTS[p].name} (${PTS[p].desc})`]),"",v=>{
+    if(k.swab&&!k.judged){K.say("검사가 진행 중이에요. 환자를 바꾸려면 '새 검사'를 누르세요.","hint");return false;}
+    if(k.judged)kNew();k.pt=v;K.step("pt");K.say(`${PTS[v].name}(${PTS[v].desc})를 검사합니다. 면봉으로 검체를 채취하세요.`);kRender();}),
+  seg("k-type","키트 종류",[["gold","금나노 키트"],["cd","카본닷 키트"]],"gold",v=>{
+    if(k.swab&&!k.judged){K.say("검사 도중에는 키트를 바꿀 수 없어요. '새 검사'를 누르세요.","hint");return false;}
+    if(k.judged)kNew();k.type=v;K.say(v==="cd"?"카본닷 키트는 선이 형광으로 빛나요. 판독할 때 UV 판독기가 필요합니다.":"금나노 키트는 눈으로 바로 빨간 선을 볼 수 있어요.");kRender();}),
+  {id:"k-swab",label:"면봉 채취",sub:"콧속 검체 묻히기",fn:()=>{
+    if(!k.pt)return K.say("먼저 검사할 환자를 고르세요.","hint");
+    if(k.swab)return K.say("이미 검체를 채취했어요. 추출액에 면봉을 돌리세요.","hint");
+    k.swab=true;K.step("swab");K.say("검체를 채취했어요. 면봉을 추출액 튜브에 넣고 10번 돌리세요.");kRender();}},
+  {id:"k-swirl",label:"면봉 돌리기",sub:"한 번 누를 때 1회",fn:()=>{
+    if(!k.swab)return K.say("면봉으로 검체를 먼저 채취하세요.","hint");
+    if(k.swirl>=10)return K.say("충분히 돌렸어요. 이제 키트에 떨어뜨리세요.","hint");
+    k.swirl++;K.say(`면봉 돌리기 ${k.swirl}/10${k.swirl<10?"":" — 검체 속 항원이 추출액에 풀려 나왔어요."}`,k.swirl<10?"info":"ok");
+    if(k.swirl===10)K.step("swirl");kRender();}},
+  {id:"k-drop",label:"1방울 떨어뜨리기",sub:"시료창 S에",fn:()=>{
+    if(k.swirl<10)return K.say("면봉을 10번 다 돌려야 항원이 충분히 나와요.","hint");
+    if(k.run||k.wait>0)return K.say("이미 반응이 시작됐어요.","hint");
+    k.drops++;if(k.drops===3){K.step("drop");K.say("3방울 넣었어요. 15분 기다리세요.","ok");}
+    else if(k.drops>4)K.say("방울이 너무 많으면 시료가 넘쳐 결과가 흐려질 수 있어요.","hint");
+    else K.say(`${k.drops}방울`);kRender();}},
+  {id:"k-wait",label:"15분 기다리기",sub:"빨리 감기",fn:()=>{
+    if(k.drops<1)return K.say("시료를 떨어뜨려야 반응이 시작돼요.","hint");
+    if(k.run||k.wait>=15)return;
+    if(k.drops<3)K.say(`${k.drops}방울만 넣었어요. 어떻게 될지 지켜보세요.`,"hint");else K.say("시료가 키트를 따라 흐르고 있어요.");
+    k.run=true;}},
+  {id:"k-uv",label:"UV 판독기 켜기·끄기",sub:"카본닷 형광 보기",fn:()=>{
+    k.uv=!k.uv;K.say(k.uv?(k.type==="cd"?"UV를 비추자 카본닷이 빛나요.":"금나노 키트는 형광이 없어서 UV를 비춰도 달라지지 않아요."):"UV 판독기를 껐어요.");kRender();}},
+  seg("k-judge","판독하기",[["양성","양성"],["음성","음성"],["무효","무효"]],"",v=>{kJudge(v);return false;}),
+  {id:"k-new",label:"새 검사",sub:"환자·키트를 바꿔 반복",cls:"wide reset",fn:()=>{kNew();K.say("새 키트를 꺼냈어요. 환자와 키트를 고르고 다시 검사하세요.");kRender();}}
+]);
+function kJudge(ans){
+  if(k.wait<15)return K.say("15분이 지나야 판독할 수 있어요.","hint");
+  if(k.judged)return K.say("이미 판독했어요. '새 검사'로 다음 검사를 하세요.","hint");
+  if(k.type==="cd"&&!k.uv)return K.say("카본닷 키트는 일반 조명에서 선이 거의 안 보여요. UV 판독기를 켜고 판독하세요.","hint");
+  const tr=kTruth(),P=PTS[k.pt];k.judged=true;K.step("read");
+  let why="";
+  if(tr==="무효")why="C선(대조선)이 없으면 시료가 키트를 따라 끝까지 흐르지 않은 거예요. 검사 자체가 실패한 것이므로 다시 해야 합니다.";
+  else if(tr==="음성"&&P.inf)why=`그런데 ${P.name}는 실제로 감염되어 있어요! 바이러스 양이 ${KN[k.type]}의 검출 한계보다 적어서 위음성이 나왔어요.`;
+  else if(tr==="양성")why="C선과 T선이 모두 나타났어요. 검체 속 항원이 T선의 항체와 결합해 표지 입자가 모였어요.";
+  else why="C선만 나타났어요. 검사는 정상으로 진행됐고 항원이 없었어요.";
+  K.say((ans===tr?`정답, ${tr}. `:`판독이 달라요. 정답은 ${tr}. `)+why,ans===tr?"ok":"hint");
+  K.log(`${P.name} · ${KN[k.type]} · ${k.drops}방울 → ${tr}${tr==="음성"&&P.inf?" (위음성)":""} · 내 판독: ${ans}`);
+  if(tr!=="무효"){kRes[k.pt+k.type]=tr+(tr==="음성"&&P.inf?"*":"");}
+  if(Object.keys(kRes).length>=4)K.step("cmp");
+  kRender();
+}
+function kRender(){
+  const dark=k.uv,P=k.pt?PTS[k.pt]:null,prog=Math.min(1,k.wait/10),flow=kFlow();
+  const cK=flow?prog:0,tK=flow?prog*kT():0;
+  const line=(y,a)=>{if(a<=0)return"";
+    if(k.type==="gold")return `<rect x="182" y="${y}" width="36" height="6" rx="2" fill="#B3263A" opacity="${a}"/>`;
+    return dark?`<rect x="182" y="${y}" width="36" height="6" rx="2" fill="#5EF2FF" opacity="${a}" filter="url(#glow)"/>`
+               :`<rect x="182" y="${y}" width="36" height="6" rx="2" fill="#C9C7B8" opacity="${a*.35}"/>`;};
+  let s=`<defs>${GLOW}</defs><rect width="400" height="270" rx="8" style="fill:${dark?"#15122B":"var(--bench)"}"/>`;
+  s+=`<text x="16" y="26" ${dark?'style="fill:#E9E6FF"':""}>${P?`${P.name} · ${P.desc}`:"환자를 고르세요"}</text>`;
+  s+=`<text x="16" y="44" class="mu" ${dark?'style="fill:#B8B3E6"':""}>${KN[k.type]}${dark?" · UV 판독 중":""}</text>`;
+  // 추출액 튜브
+  s+=`<rect x="40" y="110" width="34" height="115" rx="10" fill="#BFDDF0" opacity=".5"/><rect x="40" y="110" width="34" height="115" rx="10" fill="none" stroke="#7E95A6" stroke-width="2"/>`;
+  s+=`<rect x="44" y="150" width="26" height="70" rx="8" fill="#9CC8E8" opacity="${k.swirl>0?.9:.6}"/>`;
+  s+=`<text x="57" y="245" text-anchor="middle" class="mu" ${dark?'style="fill:#B8B3E6"':""}>추출액</text>`;
+  if(k.swab&&k.swirl<10){const r=k.swirl*36;s+=`<g transform="rotate(${k.swirl%2?6:-6} 57 150)"><line x1="57" y1="60" x2="57" y2="${k.swirl>0?190:120}" stroke="#E9E4D8" stroke-width="4"/><ellipse cx="57" cy="${k.swirl>0?195:125}" rx="6" ry="10" fill="#F3EBDD" stroke="#CDBFA6"/></g>`;}
+  // 카세트
+  s+=`<rect x="150" y="50" width="100" height="205" rx="16" fill="${dark?"#221E3C":"#F6F6F2"}" stroke="${dark?"#3A3560":"#C8C8C0"}" stroke-width="2"/>`;
+  s+=`<rect x="178" y="80" width="44" height="80" rx="3" fill="${dark?"#18152E":"#FFFFFF"}" stroke="${dark?"#3A3560":"#DDDDD5"}"/>`;
+  s+=`<text x="168" y="104" class="m" style="fill:${dark?"#9A95C8":"#888"};font-size:11px">C</text><text x="168" y="134" class="m" style="fill:${dark?"#9A95C8":"#888"};font-size:11px">T</text>`;
+  s+=line(98,cK)+line(128,tK);
+  s+=`<circle cx="200" cy="215" r="15" fill="${dark?"#18152E":"#FFFFFF"}" stroke="${dark?"#3A3560":"#CCC"}" stroke-width="2"/>`;
+  if(k.drops>0)s+=`<circle cx="200" cy="215" r="${Math.min(12,5+k.drops*2)}" fill="#9CC8E8" opacity=".8"/>`;
+  s+=`<text x="200" y="245" text-anchor="middle" class="m" style="fill:${dark?"#9A95C8":"#888"};font-size:11px">S</text>`;
+  // 타이머
+  s+=`<rect x="280" y="80" width="100" height="56" rx="8" fill="${dark?"#221E3C":"var(--panel)"}" stroke="${dark?"#3A3560":"var(--line)"}"/>`;
+  s+=`<text x="330" y="102" text-anchor="middle" class="mu" ${dark?'style="fill:#B8B3E6"':""}>타이머</text>`;
+  s+=`<text x="330" y="125" text-anchor="middle" class="m" style="font-size:20px;${dark?"fill:#E9E6FF":""}">${String(Math.floor(k.wait)).padStart(2,"0")}:00</text>`;
+  s+=`<text x="330" y="160" text-anchor="middle" class="mu" ${dark?'style="fill:#B8B3E6"':""}>${k.drops} 방울</text>`;
+  if(k.uv)s+=`<path d="M300 190 L370 190 L360 205 L310 205 Z" fill="#6B4DE6"/><text x="335" y="225" text-anchor="middle" style="fill:#B8B3E6">UV 판독기</text>`;
+  $("k-scene").innerHTML=SVG("0 0 400 270",s);
+  const cell=(p,t)=>{const r=kRes[p+t];return r?`<span class="${r.endsWith("*")?"fn":""}">${r.replace("*"," (위음성)")}</span>`:"-";};
+  $("k-table").innerHTML=`<table><tr><th>환자</th><th>금나노 키트</th><th>카본닷 키트</th></tr>${["A","B","C"].map(p=>`<tr><td>${PTS[p].name}<br><small>${PTS[p].desc}</small></td><td>${cell(p,"gold")}</td><td>${cell(p,"cd")}</td></tr>`).join("")}</table>`;
+}
+setInterval(()=>{if(!k.run)return;k.wait=Math.min(15,k.wait+15/40);
+  if(k.wait>=15){k.run=false;K.step("wait");K.say(k.type==="cd"&&!k.uv?"15분이 지났어요. 카본닷 키트는 UV 판독기를 켜고 판독하세요.":"15분이 지났어요. 선을 보고 판독하세요.","ok");}
+  if(!$("p-k").hidden)kRender();},100);
+
+/* ======================================================
+   2. 금나노입자 합성
+   ====================================================== */
+function wl2rgb(l){let r=0,g=0,b=0;
+  if(l<440){r=-(l-440)/60;b=1}else if(l<490){g=(l-440)/50;b=1}else if(l<510){g=1;b=-(l-510)/20}
+  else if(l<580){r=(l-510)/70;g=1}else if(l<645){r=1;g=-(l-645)/65}else{r=1}
+  const f=l<420?.3+.7*(l-380)/40:l>700?.3+.7*(780-l)/80:1;return[r*f,g*f,b*f];}
+function band(d){const x=Math.max(0,d-20);return{lam:518+x*.1+.0055*x*x,w:42+.45*d,a:1.4};}
+function solColor(b){const s=[0,0,0],n=[0,0,0];
+  for(let l=390;l<=720;l+=5){const c=wl2rgb(l),T=10**(-(b.a*Math.exp(-((l-b.lam)**2)/(2*b.w*b.w))+.15*Math.exp(-(l-380)/60)));for(let i=0;i<3;i++){s[i]+=c[i]*T;n[i]+=c[i];}}
+  return s.map((v,i)=>255*Math.pow(v/n[i],.8));}
+const SIZE={"0.5":60,"1":30,"2":15};
+const FIN={};for(const c in SIZE)FIN[c]=solColor(band(SIZE[c]));
+const AGG=solColor({lam:625,w:130,a:.9});
+const G=Exp("g",[["goggle","보안경을 쓴다"],["au","염화금산(HAuCl₄) 용액 20 mL를 플라스크에 붓는다"],["heat","핫플레이트를 켜 끓을 때까지 가열한다"],
+  ["cit","시트르산 나트륨 용액을 넣는다 (양을 골라 보세요)"],["watch","색 변화를 끝까지 관찰한다 (약 10분)"],["laser","빨간색 레이저를 비춰 틴들 효과를 확인한다"],["green","녹색 레이저로 바꿔 비추고 빨간색과 비교한다"],
+  ["save","결과를 보관함에 담고, 시트르산 나트륨 양을 바꿔 다시 합성해 색을 비교한다"],["salt","NaCl 양을 골라 시험관에 섞고 색 변화를 관찰한다 (전체 1 mL)"],["saltcmp","NaCl 0.1 · 0.3 · 0.5 mL 시험관 3개의 색을 비교한다"],["dye","새 플라스크에 빨간 식용색소 용액을 담아 레이저를 비추고 금나노 용액과 비교한다"]]);
+let g={goggle:false,au:false,heat:false,temp:22,citSel:"1",cit:null,t:0,mk:{},done:false,laser:false,lasCol:"red",seen:{},dye:false,ref:{},dyeSeen:{},salt:false,saltK:0,tubeSel:"low",tubes:{},saved:[]};
+/* 소금물 양 3단계 시험관 (수업용 단순화). 시험관마다 금나노 0.5 mL + 250 mM NaCl na mL + 증류수 w mL = 1 mL (참고: 최종 NaCl 25 · 75 · 125 mM)
+   소금물이 많을수록 Na⁺가 입자 표면의 (−)전하를 더 많이 가려 더 많이 뭉침(응집) → 붉은색 → 보라색 → 파란색 */
+const TUBE={"low":{kt:.3,name:"적게",na:.1,w:.4,col:"적보라색 (조금 응집)",msg:"색이 조금 보라빛으로 변해요. Na⁺가 입자 표면의 (−)전하를 일부 가려서, 몇몇 입자가 뭉치기 시작했어요."},
+  "mid":{kt:.65,name:"보통",na:.3,w:.2,col:"보라색 (응집 진행)",msg:"보라색으로 변해요. 더 많은 입자가 뭉쳐서 흡수하는 빛이 녹색에서 빨간색 쪽으로 옮겨 가요."},
+  "high":{kt:1,name:"많이",na:.5,w:0,col:"파란색 (크게 응집)",msg:"빠르게 파란색으로 변해요. 표면 전하가 많이 가려져 입자들이 서로 밀어내지 못하고 크게 뭉쳤어요. 진단 키트에서는 항원이 입자들을 모으는 원리로 이 색 변화를 쓸 수 있어요."}};
+const TK=["low","mid","high"];
+const mixTxt=v=>`금나노 용액 0.5 mL + 250 mM NaCl ${TUBE[v].na} mL + 증류수 ${TUBE[v].w} mL = 1 mL`;
+/* 레이저 색별 흡수: 금나노입자(표면 플라스몬 공명 ~520 nm)는 녹색을 강하게 흡수, 빨간색은 대부분 통과. 응집(소금물)되면 흡수가 빨간색 쪽으로 이동 */
+const LAS={red:{hex:"#ff3030",name:"빨간색",nm:650},green:{hex:"#2BE04A",name:"녹색",nm:532}};
+function lasA(col){if(g.dye)return col==="green"?.8:.05;const m=colloid()?Math.min(1,(g.t-2)/3):0,k=g.saltK;return m*(col==="green"?.85-.55*k:.15+.55*k);}
+const lasT=col=>Math.round((1-lasA(col))*100);
+/* 빨간 식용색소 용액: 분자가 녹은 진용액 → 빛을 산란시키지 않음(틴들 효과 없음). 녹색은 흡수, 빨간색은 통과 */
+const DYE=[172,34,62];
+function dyeLas(){
+  const L=LAS[g.lasCol],T=lasT(g.lasCol),ref=g.ref[g.lasCol];
+  if(g.dyeSeen[g.lasCol]){G.say(`${L.name} 레이저 (${L.nm} nm) · 색소 용액에서 빛의 길이 안 보임 · 플라스크 통과 ${T}%`);return;}
+  g.dyeSeen[g.lasCol]=1;
+  const cmp=ref!==undefined?` 금나노 용액(${L.name} 통과 ${ref}%)과 비교해 보세요.`:" 금나노 용액을 합성해 같은 레이저로 비춰 비교해 보세요.";
+  if(g.lasCol==="red"){
+    g.dyeObs=true;if(g.ref.red!==undefined)G.step("dye");
+    G.say(`색소 용액은 금나노 용액처럼 붉은색인데, 빛의 길이가 보이지 않아요! 빛은 그냥 통과해 반대편에 도착해요 (통과 ${T}%). 색소는 분자(약 1 nm)가 물에 고르게 녹은 진용액이라 빛을 산란시키지 못해요. 금나노입자(수십 nm)가 퍼진 콜로이드만 빛을 산란시키죠. 색이 같아도 틴들 효과로 콜로이드인지 구별할 수 있어요.${g.ref.red===undefined?" 금나노 용액을 합성해 같은 레이저로 비춰 비교해 보세요.":""}${g.dyeSeen.green?"":" 녹색 레이저로도 비춰 보세요."}`,"ok");
+    G.log(`빨간 식용색소 용액 + 빨간색 레이저: 빛의 길이 안 보임 (진용액), 통과 ${T}%${g.ref.red!==undefined?` · 금나노 용액은 빛의 길이 보임 (통과 ${g.ref.red}%)`:""}`);}
+  else{
+    G.say(`녹색 빛은 색소 용액을 지나며 약해져요 (통과 ${T}%). 색소도 녹색을 흡수해서 붉게 보이거든요. 그래도 빛의 길이는 보이지 않아요. 빛을 흡수하는 것과 산란시키는 것은 다른 현상이에요.${cmp}`,"ok");
+    G.log(`빨간 식용색소 용액 + 녹색 레이저: 빛이 약해짐(흡수), 빛의 길이 안 보임(산란 없음), 통과 ${T}%`);}
+}
+function lasCheck(){
+  if(g.dye)return dyeLas();
+  const L=LAS[g.lasCol],BN="증류수",T=lasT(g.lasCol),agg=g.saltK>.5;
+  if(!colloid()){
+    if(g.au)G.say(`${L.name} 빛의 길이가 거의 안 보여요. 염화금산 수용액은 이온이 녹아 있는 진용액이라 빛을 산란시키지 못해요. 반응 후 다시 비춰 보세요.`,"info");
+    else G.say(`${L.name} 빛이 증류수를 그냥 통과해요. 길이 보이지 않아요.`);return;}
+  const key=g.lasCol+(agg?"-agg":"");if(!agg&&g.done){g.ref[g.lasCol]=T;if(g.dyeObs&&g.ref.red!==undefined)G.step("dye");}if(g.seen[key]){G.say(`${L.name} 레이저 (${L.nm} nm) · 플라스크를 통과한 빛 ${T}%`);return false;}g.seen[key]=T;
+  if(g.lasCol==="red"){G.step("laser");
+    if(agg){G.say(`이번엔 빨간 빛이 금방 약해져요 (통과한 빛 ${T}%). 입자가 뭉치면서 빨간색 쪽 빛을 흡수하게 됐어요.`,"ok");G.log(`응집 후 빨간색 레이저: 빛의 길이가 짧아짐, 통과한 빛 ${T}%`);}
+    else{G.say(`플라스크 안에 빛의 길이가 끝까지 보여요! 옆의 ${BN}에서는 안 보이죠. 나노입자가 빛을 산란시키는 틴들 효과예요. 빨간 빛은 대부분 통과해요 (통과한 빛 ${T}%).${g.seen.green===undefined?" 이제 레이저 색을 녹색으로 바꿔 보세요.":""}`,"ok");
+      G.log(`빨간색 레이저 (650 nm): 빛의 길이가 끝까지 보임, ${BN}에서는 안 보임, 통과한 빛 ${T}%`);}}
+  else{
+    if(agg){G.say(`응집된 용액에서는 녹색 빛이 오히려 더 멀리 가요 (통과한 빛 ${T}%). 흡수 띠가 녹색에서 빨간색 쪽으로 옮겨 갔기 때문이에요.`,"ok");G.log(`응집 후 녹색 레이저: 빛이 더 멀리 감, 통과한 빛 ${T}%`);}
+    else{G.say(`녹색 빛은 플라스크에 들어가자마자 밝게 빛나다가 금방 사라져요. 플라스크를 통과한 빛도 ${T}%뿐이에요. 금나노입자는 520 nm 근처의 녹색 빛을 강하게 흡수하기 때문이에요(표면 플라스몬 공명).${g.seen.red===undefined?" 빨간색 레이저로도 비춰 비교해 보세요.":""}`,"ok");
+      G.log(`녹색 레이저 (532 nm): 들어가자마자 빛이 약해짐, 통과한 빛 ${T}%`);}}
+  if(!agg&&g.seen.red!==undefined&&g.seen.green!==undefined&&!g.seen.cmp){g.seen.cmp=1;G.step("green");
+    G.log(`비교: 빨간색 ${g.seen.red}% 통과 vs 녹색 ${g.seen.green}% 통과 → 금나노 용액은 녹색을 흡수하고 빨간색을 통과시켜 붉게 보임`);
+    G.say(`비교 완료! 빨간색은 ${g.seen.red}%, 녹색은 ${g.seen.green}%만 플라스크를 통과했어요. 금나노입자가 520 nm 근처의 녹색 빛을 강하게 흡수하기 때문이에요(표면 플라스몬 공명). 금나노 용액이 붉게 보이는 이유도 같아요. 녹색 빛을 흡수하고 남은 빨간 빛이 우리 눈에 오기 때문이에요.`,"ok");}
+  return true;
+}
+function gColor(){
+  if(g.dye)return DYE;
+  if(!g.au)return null;if(g.cit===null)return[238,226,140];
+  const fin=FIN[g.cit],KF=[[0,[238,226,140]],[.8,[232,232,222]],[2.5,[78,78,100]],[4.5,[112,48,96]],[10,fin]];
+  let c=fin;for(let i=0;i<KF.length-1;i++){const[a,ca]=KF[i],[b,cb]=KF[i+1];if(g.t>=a&&g.t<=b){c=lerp(ca,cb,(g.t-a)/(b-a));break;}}
+  return g.saltK>0?lerp(c,AGG,g.saltK):c;}
+const colloid=()=>g.cit!==null&&g.t>2;
+tools("g",[
+  {id:"g-gog",label:"보안경",sub:"착용하기",fn:()=>{if(g.goggle)return G.say("이미 보안경을 썼어요.");g.goggle=true;G.step("goggle");G.say("보안경을 썼어요. 염화금산 용액을 플라스크에 부으세요.","ok");gRender();}},
+  {id:"g-au",label:"염화금산 1 mM",sub:"20 mL 붓기",fn:()=>{
+    if(!g.goggle)return G.say("염화금산은 부식성이 있어요. 보안경부터 쓰세요.","hint");
+    if(g.dye)return G.say("플라스크에 색소 용액이 들어 있어요. '새로 합성'을 눌러 새 플라스크를 준비하세요.","hint");
+    if(g.au)return G.say("이미 부었어요.","hint");
+    g.au=true;G.step("au");G.log("염화금산 용액 20 mL: 연한 노란색 투명 용액");G.say("연한 노란색 용액이에요. 핫플레이트를 켜서 끓이세요.","ok");gRender();}},
+  {id:"g-heat",label:"핫플레이트",sub:"켜기·끄기",fn:()=>{
+    if(g.dye&&!g.heat)return G.say("색소 용액은 가열할 필요가 없어요. 레이저를 비춰 보세요.","hint");
+    if(!g.au&&!g.heat)return G.say("빈 플라스크는 가열하지 않아요. 용액부터 부으세요.","hint");
+    g.heat=!g.heat;G.say(g.heat?"가열을 시작했어요. 끓을 때까지 기다리세요.":"핫플레이트를 껐어요.");gRender();}},
+  {id:"g-dye",label:"빨간 식용색소 용액",sub:"플라스크에 20 mL 붓기",fn:()=>{
+    if(g.dye)return G.say("이미 색소 용액이 들어 있어요.","hint");
+    if(g.au)return G.say("플라스크가 비어 있어야 해요. '새로 합성'을 눌러 새 플라스크를 준비하세요.","hint");
+    g.dye=true;g.dyeSeen={};G.log("빨간 식용색소 용액 20 mL를 플라스크에 부음: 금나노 용액과 비슷한 붉은색 투명 용액");
+    G.say(`빨간 식용색소를 물에 푼 용액이에요. 금나노 용액과 색이 비슷하죠. ${g.laser?"":"레이저 포인터를 켜서 "}빛의 길이가 보이는지 확인해 보세요.`,"ok");
+    if(g.laser)lasCheck();gRender();}},
+  group([  seg("g-cs","시트르산 나트륨 1% 용액 양",[["0.5","0.5 mL"],["1","1 mL"],["2","2 mL"]],"1",v=>{g.citSel=v;G.say(`시트르산 나트륨 ${v} mL를 넣을 준비가 됐어요.`);}),
+    {id:"g-cit",label:"시트르산 나트륨 넣기",sub:"피펫으로 한 번에",fn:()=>{
+    if(!g.au)return G.say("염화금산 용액이 먼저 있어야 해요.","hint");
+    if(g.cit!==null)return G.say("이미 넣었어요. 다른 양으로 하려면 '새로 합성'을 누르세요.","hint");
+    if(g.temp<95)return G.say("용액이 끓을 때(약 100 °C) 넣어야 반응이 잘 일어나요. 핫플레이트를 켜고 기다리세요.","hint");
+    g.cit=g.citSel;g.t=0;g.mk={};G.step("cit");G.log(`시트르산 나트륨 ${g.cit} mL 넣음 (끓는 상태) · 환원제: Au³⁺ → Au`);G.say("시트르산 나트륨이 금 이온을 환원시키기 시작했어요. 색 변화를 지켜보세요.");gRender();}}]),
+
+  group([  seg("g-lc","레이저 색",[["red","빨간색 650 nm"],["green","녹색 532 nm"]],"red",v=>{g.lasCol=v;if(g.laser)lasCheck();else G.say(`${LAS[v].name} 레이저를 골랐어요. 레이저 포인터를 켜 보세요.`);gRender();}),
+    {id:"g-las",label:"레이저 포인터",sub:"켜기·끄기",fn:()=>{
+    g.laser=!g.laser;
+    if(!g.laser)G.say("레이저를 껐어요.");else lasCheck();
+    gRender();}}]),
+  group([seg("g-sc","NaCl 양 (250 mM NaCl)",TK.map(v=>[v,`${TUBE[v].name} (${TUBE[v].na} mL)`]),"low",v=>{g.tubeSel=v;$("g-mix").textContent=mixTxt(v);G.say(`250 mM NaCl ${TUBE[v].na} mL를 넣을 준비가 됐어요.`);}),
+  {html:`<p class="note" id="g-mix" style="margin:0;font-size:12px">${mixTxt("low")}</p>`},
+  {id:"g-salt",label:"시험관에 섞기",sub:"마이크로피펫으로 위 조성대로",fn:()=>{
+    if(g.dye)return G.say("플라스크에 색소 용액이 들어 있어요. 금나노 용액을 먼저 합성하세요.","hint");
+    if(!g.done)return G.say("금나노입자가 다 만들어진 뒤에 시험관에 나눠 담을 수 있어요.","hint");
+    const v=g.tubeSel,T=TUBE[v];if(g.tubes[v])return G.say(`NaCl ${T.na} mL 시험관은 이미 만들었어요. 다른 양을 골라 보세요.`,"hint");
+    g.tubes[v]={k:0,base:gColor()};G.step("salt");
+    G.log(`시험관 [NaCl ${T.name}]: ${mixTxt(v)} → ${T.col}`);G.say(T.msg,"ok");gRender();}}]),
+  {id:"g-save",label:"보관함에 담기",sub:"결과 비교용",fn:()=>{
+    if(!g.done)return G.say("반응이 끝난 뒤(약 10분) 담을 수 있어요.","hint");
+    if(g.saved.length>=6)g.saved.shift();g.saved.push({cit:g.cit,c:gColor()});
+    G.log(`보관: 시트르산 나트륨 ${g.cit} mL 시료 (입자 지름 약 ${SIZE[g.cit]} nm)`);
+    const kinds=new Set(g.saved.map(x=>x.cit));
+    if(kinds.size>=2){G.step("save");
+      if(kinds.size>(g.kN||0)){g.kN=kinds.size;G.log(`비교: ${[...kinds].sort((a,b)=>a-b).map(c=>c+" mL → 약 "+SIZE[c]+" nm").join(", ")} · 시트르산 나트륨이 많을수록 입자가 작아지고 더 선명한 붉은색`);}
+      G.say("시트르산 나트륨 양이 다른 시료를 비교해 보세요. ① 시트르산 나트륨이 많으면 처음에 생기는 작은 금 씨앗 입자가 많아져요. 같은 양의 금이 더 많은 씨앗으로 나뉘어 자라니 입자 하나하나는 작아져요. ② 입자가 작을수록 녹색 빛(약 520 nm)을 흡수해 선명한 붉은색으로 보이고, 입자가 커지면 흡수하는 빛이 더 긴 파장 쪽으로 옮겨 가서 보라빛을 띠어요.","ok");}
+    else G.say("보관했어요. '새로 합성'을 눌러 시트르산 나트륨 양을 바꿔 다시 해 보세요.","ok");gRender();}},
+  {id:"g-new",label:"새로 합성",sub:"보관함은 유지",cls:"reset",fn:()=>{
+    g={...g,au:false,heat:false,temp:22,cit:null,t:0,mk:{},done:false,salt:false,saltK:0,tubes:{},seen:{},dye:false,dyeSeen:{}};
+    G.unstep(["au","heat","cit","watch","salt"]);G.say("새 플라스크를 준비했어요(시험관은 비웠어요). 시트르산 나트륨 양을 바꿔 다시 합성하거나, 빨간 식용색소 용액을 담아 비교해 보세요.");gRender();}}
+]);
+const FLASK="M170 95 L170 132 L128 218 Q126 224 133 224 L227 224 Q234 224 232 218 L190 132 L190 95 Z";
+function gRender(){
+  const col=gColor(),boil=g.au&&g.temp>=95,beamK=colloid()?Math.min(1,(g.t-2)/3):(g.au?.04:0),now=Date.now();
+  let s=`<defs>${GLOW}<clipPath id="gfl"><path d="${FLASK}"/></clipPath></defs><rect width="400" height="280" rx="8" style="fill:var(--bench)"/>`;
+  s+=`<rect x="0" y="250" width="400" height="30" style="fill:var(--line)"/>`;
+  s+=`<text x="16" y="26" class="m">온도 ${g.temp.toFixed(0)} °C${g.temp>=95&&g.au?" · 끓는 중":""}</text>`;
+  s+=`<text x="16" y="44" class="m mu">${g.dye?"플라스크: 빨간 식용색소 용액 (비교용)":g.cit!==null?`반응 ${g.t.toFixed(1)}분 · 시트르산 나트륨 ${g.cit} mL`:"시트르산 나트륨 넣기 전"}</text>`;
+  s+=`<text x="16" y="62" class="mu">${g.goggle?"보안경 착용":"보안경 미착용"}</text>`;
+  // 보관함
+  s+=`<text x="250" y="22" class="mu">보관함</text>`;
+  if(g.saved.length)s+=`<text x="244" y="78" text-anchor="end" class="mu" style="font-size:9px">시트르산 나트륨 mL</text>`;
+  g.saved.forEach((v,i)=>{const x=250+i*24;s+=`<rect x="${x}" y="30" width="16" height="34" rx="3" fill="${rgb(v.c)}" stroke="#999"/><text x="${x+8}" y="78" text-anchor="middle" class="m mu" style="font-size:9px">${v.cit}</text>`;});
+  // 시험관 꽂이 (소금물 양 3단계)
+  if(g.done||Object.keys(g.tubes).length){
+    s+=`<text x="14" y="98" class="mu" style="font-size:10px">시험관 (NaCl mL)</text><rect x="12" y="160" width="96" height="5" rx="2" style="fill:var(--line)"/>`;
+    TK.forEach((v,i)=>{const x=20+i*30,t=g.tubes[v];
+      if(t){const c=lerp(lerp(t.base,[255,255,255],.12),AGG,t.k);s+=`<rect x="${x+1}" y="124" width="14" height="39" rx="6" fill="${rgb(c)}"/>`;}
+      s+=`<rect x="${x}" y="104" width="16" height="60" rx="7" fill="none" stroke="#999" ${t?"":'stroke-dasharray="3 3"'}/>`;
+      s+=`<text x="${x+8}" y="178" text-anchor="middle" class="mu" style="font-size:9px">${TUBE[v].na}</text>`;});}
+  // 핫플레이트
+  s+=`<rect x="115" y="226" width="130" height="24" rx="4" style="fill:var(--plate)"/><circle cx="232" cy="238" r="5" fill="${g.heat?"#E5483B":"#777"}"/>`;
+  if(g.heat)s+=`<rect x="125" y="224" width="110" height="3" fill="#E5483B" opacity=".5"/>`;
+  // 레이저 (공기 중 경로는 흐리게)
+  const LC=LAS[g.lasCol].hex,TR=1-lasA(g.lasCol),TD=1;
+  s+=`<rect x="14" y="189" width="52" height="14" rx="3" style="fill:var(--fg)"/><rect x="62" y="192" width="6" height="8" fill="${LC}"/>`;
+  s+=`<text x="40" y="216" text-anchor="middle" class="m mu" style="font-size:9px">${LAS[g.lasCol].nm} nm</text>`;
+  if(g.laser){s+=`<line x1="68" y1="196" x2="139" y2="196" stroke="${LC}" stroke-width="1" opacity=".15"/><line x1="221" y1="196" x2="285" y2="196" stroke="${LC}" stroke-width="1" opacity="${(.15*TR).toFixed(3)}"/><line x1="341" y1="196" x2="392" y2="196" stroke="${LC}" stroke-width="1" opacity="${(.15*TR*TD).toFixed(3)}"/>`;
+    s+=`<circle cx="393" cy="196" r="${(2+3*TR*TD).toFixed(1)}" fill="${LC}" opacity="${(.15+.85*TR*TD).toFixed(2)}" filter="url(#glow)"/>`;
+    if(colloid()||g.dye)s+=`<text x="394" y="150" text-anchor="end" class="m mu" style="font-size:10px">플라스크 통과 ${lasT(g.lasCol)}%</text>`;}
+  // 용액
+  if(col){s+=`<g clip-path="url(#gfl)"><rect x="100" y="168" width="160" height="60" fill="${rgb(col)}"/>`;
+    if(boil)for(let i=0;i<9;i++){const ph=((now/18+i*37)%56),x=138+((i*29)%86);s+=`<circle cx="${x}" cy="${222-ph}" r="${1.5+(i%3)}" fill="#fff" opacity="${.7*(1-ph/56)}"/>`;}
+    if(g.laser){const st=x=>`<stop offset="${x}" stop-color="${LC}" stop-opacity="${(beamK*Math.pow(TR,x)).toFixed(3)}"/>`;
+      s+=`<linearGradient id="gbeam" gradientUnits="userSpaceOnUse" x1="139" y1="0" x2="221" y2="0">${[0,.25,.5,.75,1].map(st).join("")}</linearGradient>`;
+      s+=`<rect x="120" y="194.5" width="120" height="3" fill="url(#gbeam)" filter="url(#glow)"/>`;}
+    s+=`</g>`;}
+  s+=`<path d="${FLASK}" style="fill:none;stroke:var(--fg)" stroke-width="2" opacity=".75"/>`;
+  s+=`<text x="164" y="114" text-anchor="end" class="mu">플라스크</text>`;
+  // 옆 비커 (증류수 또는 빨간 색소 용액) — 진용액이라 빛의 길이는 보이지 않음
+  s+=`<rect x="285" y="182" width="56" height="42" fill="#BFDDF0" opacity=".5"/><path d="M283 160 L283 224 L343 224 L343 160" style="fill:none;stroke:var(--fg)" stroke-width="2" opacity=".75"/><text x="313" y="243" text-anchor="middle" class="mu">증류수</text>`;
+  $("g-scene").innerHTML=SVG("0 0 400 280",s);
+}
+const MARKS=[[.8,"연노랑 → 거의 무색 (금 이온이 환원되기 시작)"],[2.5,"회색빛 검푸른색 (금 원자가 모여 작은 씨앗 입자 생성)"],[4.5,"보라색 (입자가 자라는 중)"]];
+let gCool=false;
+setInterval(()=>{
+  g.temp=g.heat&&g.au?Math.min(100,g.temp+1.5):Math.max(22,g.temp-.5);
+  if(g.heat&&g.temp>=99&&!G.done.has("heat")){G.step("heat");G.say("용액이 끓고 있어요. 시트르산 나트륨 양을 고르고 넣으세요.","ok");}
+  if(g.cit!==null&&!g.done){
+    if(g.temp>=95){g.t+=.08;gCool=false;
+      MARKS.forEach(([t,m])=>{if(g.t>=t&&!g.mk[t]){g.mk[t]=1;G.log(`${t}분: ${m}`);G.say(m);}});
+      if(g.t>=10){g.t=10;g.done=true;G.step("watch");G.log(`10분: 반응 완료, 예상 입자 지름 약 ${SIZE[g.cit]} nm`);
+        G.say(`반응이 끝났어요. 덩어리 금은 노란색인데, 지름 약 ${SIZE[g.cit]} nm 금나노입자 용액은 이런 색이에요. 레이저를 비춰 보세요.`,"ok");}}
+    else if(!gCool){gCool=true;G.say("온도가 떨어져서 반응이 거의 멈췄어요. 핫플레이트를 다시 켜세요.","hint");}}
+  {let all=TK.every(v=>g.tubes[v]);
+    TK.forEach(v=>{const t=g.tubes[v];if(t&&t.k<TUBE[v].kt){t.k=Math.min(TUBE[v].kt,t.k+.03);all=false;}});
+    if(all&&!g.cmpT){g.cmpT=true;G.step("saltcmp");
+      G.log("비교: NaCl 0.1 → 0.3 → 0.5 mL, 적보라 → 보라 → 파란색 (NaCl이 많을수록 더 많이 응집)");
+      G.say("시험관 3개와 플라스크의 원래 색을 비교해 보세요. NaCl을 많이 넣을수록 Na⁺가 입자 표면의 (−)전하를 더 많이 가려 입자들이 더 많이 뭉치고, 색이 붉은색 → 보라색 → 파란색으로 바뀌어요. 시험관마다 금나노 용액(0.5 mL)과 전체 부피(1 mL)를 같게 하고, 증류수로 맞춰 NaCl 양만 다르게 했어요.","ok");}}
+  if(!$("p-g").hidden)gRender();},100);
+
+/* ======================================================
+   3. 카본닷 합성
+   ====================================================== */
+const C=Exp("c",[["goggle","보안경을 쓴다"],["ca","시트르산 일수화물 1.00 g을 저울로 재어 비커에 넣는다"],["urea","요소를 몰비에 맞게 넣는다 (시트르산 : 요소 = 1:1 · 1:3 · 1:5 몰비)"],["water","증류수 10 mL를 넣는다"],
+  ["stir","유리막대로 저어 완전히 녹인다"],["mw","핫플레이트(약 200 °C)로 가열한다 (시간을 골라 보세요)"],["dis","식힌 뒤 물을 넣어 녹이고 바이알에 옮긴다"],
+  ["uv","실내등을 끄고 UV 랜턴을 비춘다"],["save","바이알을 보관함에 담는다"],["ratio","비율을 바꿔 다시 합성하고, 세 비율의 UV 형광 색을 비교한다"]]);
+let c={goggle:false,ca:false,urea:false,water:false,stir:0,mwSel:"15",mw:"none",mwP:0,product:null,vial:false,light:true,uv:false,dil:1,scale:0,ratioSel:"1",ur:null,saved:[],cmpDone:false};
+/* 시트르산 : 요소 몰비에 따른 형광 (수업용 단순화) — 요소가 많을수록 질소가 더 들어가 형광이 긴 파장(파랑→청록→연두) 쪽으로 이동 */
+/* 몰비 기준 요소 질량: 시트르산 일수화물(210.14 g/mol) 1.00 g ≈ 4.76 mmol, 요소 60.06 g/mol */
+const UREA={"1":"0.29","3":"0.86","5":"1.43"};
+const RAT={"1":{name:"파란색",nm:450,col:[110,170,255],k:.8},"3":{name:"청록색",nm:490,col:[90,240,200],k:1},"5":{name:"연두색",nm:520,col:[175,240,95],k:.9}};
+const PROD={under:{name:"반응 부족",amb:[236,214,120],base:.2,log:"아직 끈적한 액체, 연한 노란색 (가열 부족)"},
+  good:{name:"카본닷",amb:[110,62,28],base:1,log:"갈색 거품 모양 고체 생성"},
+  burnt:{name:"과열",amb:[38,30,25],base:.3,log:"검게 탄 덩어리, 탄 냄새 (가열 과다)"}};
+const Q={1:.9};
+const glowK=()=>c.vial&&c.uv?PROD[c.product].base*RAT[c.ur].k*Q[c.dil]*(c.light?.3:1):0;
+const vGlow=v=>c.uv?PROD[v.product].base*RAT[v.ur].k*Q[v.dil]*(c.light?.3:1):0;
+tools("c",[
+  {id:"c-gog",label:"보안경",sub:"착용하기",fn:()=>{c.goggle=true;C.step("goggle");C.say("보안경을 썼어요. 저울로 시트르산을 재세요.","ok");cRender();}},
+  {id:"c-ca",label:"시트르산 일수화물",sub:"1.00 g 계량",fn:()=>{
+    if(!c.goggle)return C.say("보안경부터 쓰세요.","hint");if(c.ca)return C.say("이미 넣었어요.","hint");
+    c.ca=true;c.scale=1;C.step("ca");C.say("저울 1.00 g. 비커에 넣었어요. 이번엔 요소를 몰비에 맞게 넣으세요.","ok");cRender();}},
+  seg("c-rs","시트르산 : 요소 몰비",[["1","1:1"],["3","1:3"],["5","1:5"]],"1",v=>{if(c.urea){C.say("요소를 이미 넣었어요. 비율을 바꾸려면 '다시 하기'를 누르세요.","hint");return false;}c.ratioSel=v;C.say(`시트르산 : 요소 = 1:${v} (몰비)로 맞췄어요. 시트르산 1.00 g에 요소 ${UREA[v]} g이에요.`);}),
+  {id:"c-urea",label:"요소",sub:"몰비대로 계량",fn:()=>{
+    if(!c.ca)return C.say("순서대로 시트르산부터 넣으세요.","hint");if(c.urea)return C.say("이미 넣었어요.","hint");
+    c.urea=true;c.ur=c.ratioSel;c.scale=Number(UREA[c.ur]);C.step("urea");C.log(`시트르산 1.00 g + 요소 ${UREA[c.ur]} g (몰비 1:${c.ur})`);
+    C.say(`요소 ${UREA[c.ur]} g을 넣었어요 (시트르산 : 요소 = 1:${c.ur} 몰비). 요소는 카본닷에 질소를 넣어 주는 재료예요. 비율에 따라 형광 색이 어떻게 달라지는지 나중에 비교해 보세요.`,"ok");cRender();}},
+  {id:"c-water",label:"증류수",sub:"10 mL",fn:()=>{
+    if(!c.urea)return C.say("시트르산과 요소를 먼저 넣으세요.","hint");if(c.water)return C.say("이미 넣었어요.","hint");
+    c.water=true;C.step("water");C.say("가루가 아직 덜 녹았어요. 유리막대로 저으세요.");cRender();}},
+  {id:"c-stir",label:"유리막대",sub:"저어 녹이기",fn:()=>{
+    if(!c.water)return C.say("물을 넣어야 녹일 수 있어요.","hint");if(c.stir>=3)return C.say("다 녹았어요.","hint");
+    c.stir++;if(c.stir>=3){C.step("stir");C.log("시트르산 + 요소 + 물: 무색 투명 용액");C.say("완전히 녹았어요. 가열 시간을 고르고 핫플레이트로 가열하세요.","ok");}else C.say(`젓는 중 ${c.stir}/3`);cRender();}},
+  seg("c-mws","핫플레이트 가열 시간 (약 200 °C)",[["5","5분"],["15","15분"],["30","30분"]],"15",v=>{c.mwSel=v;C.say(`${v}분으로 맞췄어요.`);}),
+  {id:"c-mw",label:"핫플레이트",sub:"비커 올려 가열 시작",fn:()=>{
+    if(c.stir<3)return C.say("재료를 다 녹인 뒤 가열하세요.","hint");
+    if(c.mw!=="none")return C.say(c.mw==="run"?"가열 중이에요.":"이미 가열했어요. 다른 조건은 '다시 하기'로.","hint");
+    c.mw="run";c.mwP=0;c.target=c.mwSel==="5"?"under":c.mwSel==="15"?"good":"burnt";C.say("비커를 핫플레이트에 올려 가열해요. 물이 먼저 끓어 증발하고, 그다음 시트르산과 요소가 반응해 탄소 입자가 만들어져요. 암모니아 냄새가 나니 환기하세요.");cRender();}},
+  {id:"c-dis",label:"물 10 mL",sub:"녹여서 바이알로",fn:()=>{
+    if(c.mw!=="done")return C.say("가열이 끝난 뒤에 하세요.","hint");if(c.vial)return C.say("이미 바이알에 옮겼어요.","hint");
+    c.vial=true;c.dil=1;C.step("dis");C.log(`[1:${c.ur}] ${PROD[c.product].name} 용액: ${c.product==="good"?"진한 갈색":c.product==="under"?"연노란색":"검은색"}`);
+    C.say("바이알에 옮겼어요. 실내등을 끄고 UV 랜턴을 비춰 보세요.","ok");cRender();}},
+  {id:"c-light",label:"실내등",sub:"켜기·끄기",fn:()=>{c.light=!c.light;C.say(c.light?"불을 켰어요.":"불을 껐어요.");cCheckUV();cRender();}},
+  {id:"c-uv",label:"UV 랜턴 365 nm",sub:"켜기·끄기",fn:()=>{
+    if(!c.goggle)return C.say("자외선은 눈에 해로워요. 보안경부터 쓰세요.","hint");
+    c.uv=!c.uv;if(!c.uv)C.say("UV 랜턴을 껐어요.");cCheckUV();cRender();}},
+  {id:"c-save",label:"보관함에 담기",sub:"비율별 비교용",fn:()=>{
+    if(!c.vial)return C.say("바이알에 시료가 있어야 담을 수 있어요.","hint");
+    if(c.saved.some(v=>v.ur===c.ur&&v.product===c.product&&v.dil===c.dil))return C.say("같은 조건의 시료가 이미 보관함에 있어요. 비율을 바꿔 다시 합성해 보세요.","hint");
+    if(c.saved.length>=6)c.saved.shift();c.saved.push({ur:c.ur,product:c.product,dil:c.dil});C.step("save");
+    C.log(`보관: 1:${c.ur} 시료 (${PROD[c.product].name})`);
+    const good=new Set(c.saved.filter(v=>v.product==="good").map(v=>v.ur));
+    C.say(good.size>=3?"세 비율의 카본닷이 모두 모였어요! 실내등을 끄고 UV 랜턴을 켜서 보관함의 색을 비교해 보세요.":`보관했어요. 아직 모은 비율: ${[...good].sort().map(u=>"1:"+u).join(", ")||"없음"}. '다시 하기'로 비율을 바꿔 합성해 보세요. 공정한 비교를 위해 가열 시간(15분)은 같게 하세요.`,"ok");
+    cCheckCmp();cRender();}},
+  {id:"c-new",label:"다시 하기",sub:"비율·가열 시간 바꿔 보기",cls:"wide reset",fn:()=>{
+    c={...c,ca:false,urea:false,water:false,stir:0,mw:"none",mwP:0,product:null,vial:false,uv:false,dil:1,scale:0,light:true,ur:null};
+    C.unstep(["ca","urea","water","stir","mw","dis","uv"]);C.say("새 비커를 준비했어요(보관함은 그대로예요). 이번엔 시트르산 : 요소 몰비를 바꿔 보세요.");cRender();}}
+]);
+function cCheckCmp(){
+  if(c.cmpDone||!c.uv||c.light)return false;
+  const good=new Set(c.saved.filter(v=>v.product==="good").map(v=>v.ur));if(good.size<3)return false;
+  c.cmpDone=true;C.step("ratio");
+  C.log("비율 비교 (UV 365 nm): 1:1 파란색 (약 450 nm) → 1:3 청록색 (약 490 nm) → 1:5 연두색 (약 520 nm)");
+  C.say("보관함을 보세요! 1:1은 파란색, 1:3은 청록색, 1:5는 연두색으로 빛나요. 요소가 많을수록 카본닷에 질소가 더 많이 들어가고, 빛을 내는 구조가 바뀌어 형광이 더 긴 파장(파랑 → 녹색) 쪽으로 옮겨 가요. 같은 365 nm 자외선을 쪼여도 재료 비율로 형광 색을 조절할 수 있어요. 단, 실제 실험에서는 색 차이가 이보다 작을 수 있어요.","ok");
+  return true;}
+function cCheckUV(){
+  if(!c.uv)return;
+  if(cCheckCmp())return;
+  if(!c.vial)return C.say("바이알에 시료가 아직 없어요.","hint");
+  const k=glowK(),P=PROD[c.product];
+  if(c.light)return C.say("UV를 켰지만 실내가 밝아서 형광이 잘 안 보여요. 실내등을 꺼 보세요.","hint");
+  C.step("uv");
+  if(cCheckCmp())return;
+  if(c.product==="good"){const R=RAT[c.ur];C.say(`${R.name}(약 ${R.nm} nm)으로 빛나요! 자외선을 흡수하고 가시광선을 내보내는 형광이에요. 바이알을 보관함에 담고 비율을 바꿔 다시 합성해 보세요.`,"ok");C.log(`UV 365 nm, 소등: [1:${c.ur}] ${R.name} 형광 (약 ${R.nm} nm)`);}
+  else{C.say(`형광이 약해요. ${c.product==="under"?"가열이 부족해 카본닷이 거의 안 만들어졌어요.":"너무 오래 가열해 타 버렸어요."} '다시 하기'로 조건을 바꿔 보세요.`,"hint");C.log(`UV: 형광 약함 (${P.name})`);}
+}
+function cRender(){
+  const dark=!c.light,gk=glowK(),GC=c.ur?RAT[c.ur].col:[124,245,208];
+  const grad=(id,col)=>`<radialGradient id="${id}"><stop offset="0" stop-color="${rgb(col)}" stop-opacity=".9"/><stop offset="1" stop-color="${rgb(col)}" stop-opacity="0"/></radialGradient>`;
+  let s=`<defs>${GLOW}${grad("cg",GC)}${["1","3","5"].map(u=>grad("cg"+u,RAT[u].col)).join("")}</defs>`;
+  s+=`<rect width="400" height="280" rx="8" style="fill:var(--bench)"/><rect x="0" y="250" width="400" height="30" style="fill:var(--line)"/>`;
+  // 저울
+  s+=`<rect x="14" y="222" width="86" height="28" rx="4" style="fill:var(--plate)"/><rect x="24" y="214" width="66" height="8" rx="2" fill="#9AA0A8"/><rect x="34" y="230" width="46" height="14" rx="2" fill="#B9E3B0"/><text x="57" y="241" text-anchor="middle" class="m" style="fill:#1C2126;font-size:10px">${c.scale.toFixed(2)} g</text>`;
+  s+=`<text x="57" y="208" text-anchor="middle" class="mu">저울</text>`;
+  // 핫플레이트 (비커를 올려 가열)
+  const hot=c.mw==="run";
+  s+=`<rect x="190" y="226" width="120" height="24" rx="4" style="fill:var(--plate)"/><circle cx="296" cy="238" r="5" fill="${hot?"#E5483B":"#777"}"/>`;
+  if(hot)s+=`<rect x="198" y="224" width="96" height="3" fill="#E5483B" opacity=".6"/><text x="250" y="142" text-anchor="middle" class="m">${Math.round(22+178*Math.min(1,c.mwP*6))} °C · ${(c.mwP*Number(c.mwSel)).toFixed(0)}/${c.mwSel}분</text>`;
+  s+=`<text x="250" y="266" text-anchor="middle" class="mu">핫플레이트</text>`;
+  // 비커 (가열 전에는 저울 옆, 가열을 시작하면 핫플레이트 위)
+  {
+    let inner="";
+    if(hot){const p=c.mwP,PT=PROD[c.target].amb;
+      if(p<.5){const h=38-28*(p/.5),col=lerp([220,238,246],[236,214,120],p/.5);
+        inner=`<rect x="114" y="${243-h}" width="60" height="${h}" fill="${rgb(col)}" opacity=".85"/>`;
+        for(let i=0;i<6;i++){const ph=((Date.now()/20+i*41)%(h)),x=120+((i*17)%48);inner+=`<circle cx="${x}" cy="${242-ph}" r="${1.5+(i%2)}" fill="#fff" opacity="${.7*(1-ph/h)}"/>`;}}
+      else{const k=(p-.5)/.5,col=lerp([236,214,120],PT,k),hh=10+14*k;
+        inner=`<path d="M118 243 Q120 ${243-hh} 134 ${241-hh} Q146 ${236-hh} 158 ${241-hh} Q170 ${239-hh} 170 243 Z" fill="${rgb(col)}"/>`;}}
+    else if(c.product){const P=PROD[c.product];inner=`<path d="M118 240 Q120 214 134 216 Q146 204 158 216 Q170 212 170 240 Z" fill="${rgb(P.amb)}"/>`;}
+    else if(c.water)inner=`<rect x="114" y="${c.stir>=3?205:205}" width="60" height="38" fill="${c.stir>=3?"#DCEEF6":"#E8E8E0"}" opacity=".8"/>${c.stir<3?`<ellipse cx="144" cy="238" rx="${22-c.stir*6}" ry="4" fill="#fff"/>`:""}`;
+    else if(c.ca)inner=`<ellipse cx="144" cy="238" rx="${c.urea?22:14}" ry="${c.urea?6:4}" fill="#FAFAF6" stroke="#CCC"/>`;
+    const onHP=c.mw!=="none"&&!c.vial;
+    s+=`<g${onHP?' transform="translate(106,-20)"':""}>${inner}<path d="M112 175 L112 244 L176 244 L176 175" style="fill:none;stroke:var(--fg)" stroke-width="2" opacity=".75"/><text x="144" y="166" text-anchor="middle" class="mu">${hot?"":"비커"}</text></g>`;}
+  // 바이알
+  if(c.vial){const P=PROD[c.product],kk=Math.min(1,1.3/Math.pow(c.dil,.6)),amb=lerp([238,238,232],P.amb,kk);
+    if(gk>0)s+=`<circle cx="355" cy="215" r="${26+20*gk}" fill="url(#cg)" opacity="${gk}"/>`;
+    s+=`<rect x="342" y="185" width="26" height="58" rx="4" fill="${gk>.15?rgb(lerp(amb,GC,Math.min(.85,gk))):rgb(amb)}" stroke="#999"/>`;
+    s+=`<rect x="344" y="176" width="22" height="9" rx="2" fill="#555"/>`;}
+  else s+=`<rect x="342" y="185" width="26" height="58" rx="4" fill="none" stroke="#999" stroke-dasharray="3 3"/><text x="355" y="266" text-anchor="middle" class="mu" style="font-size:10px">바이알</text>`;
+  // 보관함 (비율별 바이알)
+  const vx=i=>132+i*31;let savedGlow="";
+  s+=`<text x="132" y="52" class="mu">보관함</text><rect x="126" y="112" width="${Math.max(1,c.saved.length)*31+3}" height="4" rx="1" style="fill:var(--line)"/>`;
+  c.saved.forEach((v,i)=>{const P=PROD[v.product],kk=Math.min(1,1.3/Math.pow(v.dil,.6)),amb=lerp([238,238,232],P.amb,kk),gv=vGlow(v),col=RAT[v.ur].col;
+    s+=`<rect x="${vx(i)}" y="68" width="18" height="44" rx="3" fill="${gv>.15?rgb(lerp(amb,col,Math.min(.85,gv))):rgb(amb)}" stroke="#999"/><rect x="${vx(i)+2}" y="62" width="14" height="6" rx="1" fill="#555"/>`;
+    s+=`<text x="${vx(i)+9}" y="128" text-anchor="middle" class="m" ${dark?'style="fill:#E7E9E4;font-size:9px"':'style="font-size:9px"'}>1:${v.ur}</text>`;
+    if(gv>0)savedGlow+=`<circle cx="${vx(i)+9}" cy="90" r="${14+12*gv}" fill="url(#cg${v.ur})" opacity="${gv}"/><rect x="${vx(i)}" y="68" width="18" height="44" rx="3" fill="${rgb(col)}" opacity="${.25+.6*gv}" filter="url(#glow)"/>`;});
+  if(dark)savedGlow+=c.saved.map((v,i)=>`<text x="${vx(i)+9}" y="128" text-anchor="middle" class="m" style="fill:#E7E9E4;font-size:9px">1:${v.ur}</text>`).join("");
+  // UV 랜턴
+  if(c.uv)s+=`<path d="M336 96 L374 96 L380 170 L330 170 Z" fill="#7B5CFF" opacity="${dark?.25:.12}"/>`;
+  s+=`<rect x="330" y="76" width="50" height="20" rx="4" fill="${c.uv?"#6B4DE6":"#555"}"/><text x="355" y="68" text-anchor="middle" class="mu">UV 랜턴</text>`;
+  if(dark)s=s+`<rect width="400" height="280" rx="8" fill="#000" opacity=".55" pointer-events="none"/>`+(gk>0?`<circle cx="355" cy="215" r="${26+20*gk}" fill="url(#cg)" opacity="${gk}"/><rect x="342" y="185" width="26" height="58" rx="4" fill="${rgb(GC)}" opacity="${.25+.6*gk}" filter="url(#glow)"/>`:"")+savedGlow+(c.uv?`<rect x="330" y="76" width="50" height="20" rx="4" fill="#6B4DE6"/><path d="M336 96 L374 96 L380 170 L330 170 Z" fill="#7B5CFF" opacity=".25"/>`:"");
+  s+=`<text x="16" y="26" ${dark?'style="fill:#E7E9E4"':""}>${c.goggle?"보안경 착용":"보안경 미착용"} · 실내등 ${c.light?"켜짐":"꺼짐"}</text>`;
+  $("c-scene").innerHTML=SVG("0 0 400 280",s);
+}
+setInterval(()=>{if(c.mw!=="run")return;c.mwP+=.02;
+  if(c.mwP>=1){c.mw="done";c.product=c.target;C.step("mw");
+    C.log(`핫플레이트 약 200 °C, ${c.mwSel}분 가열: ${PROD[c.product].log}`);
+    C.say(c.product==="good"?"물이 다 증발하고 갈색 고체가 생겼어요. 핫플레이트를 끄고 식힌 뒤 물을 넣어 녹이세요. 비커가 뜨거우니 집게를 쓰세요.":`결과: ${PROD[c.product].log}. 그래도 다음 단계를 진행해 형광을 확인해 보세요.`,c.product==="good"?"ok":"hint");}
+  if(!$("p-c").hidden)cRender();},100);
+
+/* ======================================================
+   4. 식물 SERS 측정
+   ====================================================== */
+const P=Exp("p",[["pick","온실의 보리를 하나 고른다 (보리를 눌러도 돼요)"],["meas0","센서 없이 785 nm 라만 레이저로 측정해 본다"],["sensor","잎 뒷면 기공으로 은 나노셸 센서(AgNS@PDDA)를 주입한다"],
+  ["meas","센서를 넣은 잎을 측정해 살리실산(1035 cm⁻¹)·ATP(729 cm⁻¹) 봉우리를 확인한다"],["all","6그루를 모두 센서로 측정한다"],["dec","신호가 강한 식물을 격리한다"],["week","7일 뒤 온실을 확인한다"]]);
+const XS=[];for(let x=200;x<=1800;x+=4)XS.push(x);
+/* 봉우리 위치(cm⁻¹): Son et al., Nat. Nanotechnol. 18, 205 (2023)
+   AgNS(Ag···O) 235 · PDDA 790(기준 봉우리) · 살리실산(SA) 808, 1035, 1248 · ATP 729, 1325
+   세기는 수업용 모식 값 */
+const PK={ag:[[235,9,1]],pdda:[[790,9,.22]],sa:[[808,8,.3],[1035,8,.42],[1248,10,.24]],atp:[[729,7,.36],[1325,10,.18]]};
+const gau=(x,m,w)=>Math.exp(-((x-m)**2)/(2*w*w));
+let pl,sel=null,pw=false;
+function pNew(){const inf=new Set();while(inf.size<2)inf.add(Math.floor(Math.random()*6));
+  pl=[...Array(6)].map((_,i)=>({inf:inf.has(i),k:.8+.4*Math.random(),sensor:false,sNo:null,sYes:null,iso:false,fate:null}));sel=null;pw=false;}
+pNew();
+function spec(p,withS){
+  const amp=(k,a)=>PK[k].reduce((t,[m,w,h])=>t+h*a*gau(x0,m,w),0);let x0=0;
+  const sa=p.inf?p.k:.06+.04*p.k,atp=p.inf?.85*p.k:.05+.03*p.k;
+  return XS.map(x=>{x0=x;const bg=.05+.00002*(x-200);
+    if(!withS)return bg+(Math.random()-.5)*.03;
+    return bg+amp("ag",1)+amp("pdda",1)+amp("sa",sa)+amp("atp",atp)+(Math.random()-.5)*.02;});}
+const at=(a,x)=>{let i=0,d=1e9;XS.forEach((v,j)=>{if(Math.abs(v-x)<d){d=Math.abs(v-x);i=j;}});const b=.05+.00002*(x-200);return Math.max(0,Math.max(a[i-1],a[i],a[i+1])-b);};
+const ratio=(a,x)=>at(a,x)/at(a,790);
+const sigOf=a=>ratio(a,1035);
+tools("p",[
+  seg("p-sel","보리 고르기",[0,1,2,3,4,5].map(i=>[i,"P"+(i+1)]),"",v=>{pPick(+v);}),
+  {id:"p-sen",label:"은 나노셸 센서",sub:"AgNS@PDDA · 기공으로 주입",fn:()=>{
+    if(sel===null)return P.say("먼저 식물을 고르세요.","hint");if(pw)return P.say("결과 확인 후에는 '새 온실'로 다시 시작하세요.","hint");
+    const p=pl[sel];if(p.sensor)return P.say("이미 센서를 넣었어요. 라만 레이저로 측정하세요.","hint");
+    p.sensor=true;P.step("sensor");P.say(`P${sel+1} 잎 뒷면의 기공으로 주사기(바늘 없음)를 대고 센서 용액을 밀어 넣었어요. 센서는 잎 세포 사이 공간에 자리 잡아요. 실리카 공을 울퉁불퉁한 은 껍질로 감싼 나노입자(AgNS)인데, 표면의 양전하 고분자(PDDA)가 음전하를 띤 신호 분자를 끌어당겨요. 이렇게 붙은 분자의 라만 신호는 약 10⁷배까지 커져요.`,"ok");pRender();}},
+  {id:"p-mea",label:"라만 레이저 785 nm",sub:"측정하기",fn:()=>{
+    if(sel===null)return P.say("먼저 식물을 고르세요.","hint");if(pw)return P.say("결과 확인 후에는 '새 온실'로 다시 시작하세요.","hint");
+    const p=pl[sel],a=spec(p,p.sensor);
+    if(p.sensor){p.sYes=a;P.step("meas");const rs=ratio(a,1035),ra=ratio(a,729);
+      P.log(`P${sel+1} · 센서 측정 · SA(1035)/PDDA ${rs.toFixed(2)} · ATP(729)/PDDA ${ra.toFixed(2)}`);
+      P.say(`P${sel+1}: 기준 봉우리(PDDA 790 cm⁻¹) 대비 살리실산 ${rs.toFixed(2)}, ATP ${ra.toFixed(2)}. ${rs>.6?"두 봉우리가 뚜렷해요! 식물이 병원균에 맞서 방어 신호를 내고 있다는 뜻이에요. 잎은 아직 초록색인데도요.":"신호 분자 봉우리가 거의 없어요. 235(은 나노셸)와 790(PDDA) 봉우리는 센서 자체의 신호예요."} 다른 보리와 비교해 보세요.`,rs>.6?"ok":"info");
+      if(pl.every(q=>q.sYes))P.step("all");}
+    else{p.sNo=a;P.step("meas0");P.log(`P${sel+1} · 센서 없이 측정 · 뚜렷한 봉우리 없음`);
+      P.say("센서 없이 측정하면 뚜렷한 봉우리가 보이지 않아요. 잎 속 신호 분자는 아주 적어서(µM 이하) 보통 라만 신호로는 묻혀 버려요. 785 nm 근적외선을 쓰는 이유는 엽록소의 강한 형광을 피하기 위해서예요. 센서를 넣고 다시 측정해 보세요.","info");}
+    pRender();}},
+  {id:"p-iso",label:"격리 표시",sub:"선택한 식물 켜기·끄기",fn:()=>{
+    if(sel===null)return P.say("먼저 식물을 고르세요.","hint");if(pw)return;
+    const p=pl[sel];p.iso=!p.iso;if(p.iso){P.step("dec");P.log(`P${sel+1} 격리 및 방제`);}
+    P.say(p.iso?`P${sel+1}를 격리하고 방제했어요.`:`P${sel+1} 격리를 풀었어요.`);pRender();}},
+  {id:"p-week",label:"7일 뒤 보기",sub:"결과 확인",fn:()=>{
+    if(pw)return P.say("이미 확인했어요. '새 온실'로 다시 해 보세요.","hint");
+    pw=true;const sick=new Set();
+    pl.forEach((p,i)=>{if(p.inf&&!p.iso){sick.add(i);const r=Math.floor(i/3),cc=i%3;
+      [[r,cc-1],[r,cc+1],[r-1,cc],[r+1,cc]].forEach(([a,b])=>{if(a>=0&&a<2&&b>=0&&b<3){const j=a*3+b;if(!pl[j].iso)sick.add(j);}});}});
+    pl.forEach((p,i)=>p.fate=sick.has(i)?"sick":p.inf&&p.iso?"saved":"ok");
+    const healthy=pl.filter(p=>p.fate!=="sick").length,missed=pl.filter(p=>p.inf&&!p.iso).length,extra=pl.filter(p=>p.iso&&!p.inf).length;
+    P.step("week");P.log(`7일 뒤: 건강 ${healthy}/6 · 놓친 감염 ${missed} · 불필요한 격리 ${extra}`);
+    P.say(missed===0?`감염된 식물을 증상이 나타나기 전에 모두 찾아냈어요! 건강한 식물 ${healthy}/6.${extra?` 다만 불필요하게 격리한 식물이 ${extra}그루 있어요.`:""}`
+      :`놓친 감염 식물이 ${missed}그루 있어서 옆 식물로 병이 퍼졌어요. 건강한 식물 ${healthy}/6. 잎이 누렇게 변한 지금에야 겉으로 보이네요.`,missed===0?"ok":"hint");
+    P.log("참고(논문): 감염 2시간 뒤(0일째)에 이미 SA·ATP 신호 검출, 병반은 2일째부터 나타남. 유전자 검사(PCR)는 밀에서 1일째부터 검출");
+    pRender();}},
+  {id:"p-new",label:"새 온실",sub:"감염 식물이 바뀜",cls:"reset",fn:()=>{pNew();P.unstep(["pick","meas0","sensor","meas","all","dec","week"]);setSeg("p-sel","");P.say("새 온실이에요. 어느 보리가 감염됐는지는 겉모습으로 알 수 없어요.");pRender();}}
+]);
+function pPick(i){sel=i;setSeg("p-sel",i);P.step("pick");P.say(`P${i+1}를 골랐어요. ${pl[i].sensor?"센서가 들어 있어요.":"센서가 아직 없어요."}`);pRender();}
+function plantSVG(cx,by,i){
+  const p=pl[i],fate=p.fate,lc=fate==="sick"?"#B08A2E":fate==="saved"?"#7FA046":"#4C8C45";
+  let s=`<g data-i="${i}" style="cursor:pointer">`;
+  s+=`<rect x="${cx-55}" y="${by-95}" width="110" height="112" fill="transparent"/>`;
+  if(sel===i)s+=`<rect x="${cx-52}" y="${by-92}" width="104" height="106" rx="8" fill="none" style="stroke:var(--gold)" stroke-width="2"/>`;
+  if(p.iso)s+=`<rect x="${cx-48}" y="${by-88}" width="96" height="98" rx="6" fill="none" style="stroke:var(--cyan)" stroke-width="2" stroke-dasharray="5 4"/>`;
+  s+=`<path d="M${cx-16} ${by-14} L${cx+16} ${by-14} L${cx+12} ${by+6} L${cx-12} ${by+6} Z" fill="#B5703D"/>`;
+  s+=`<line x1="${cx}" y1="${by-14}" x2="${cx}" y2="${by-70}" stroke="#3E6B34" stroke-width="3"/>`;
+  [[-1,-34],[1,-48],[-1,-62]].forEach(([d,y])=>{s+=`<ellipse cx="${cx+d*17}" cy="${by+y}" rx="17" ry="8" transform="rotate(${d*-25} ${cx+d*17} ${by+y})" fill="${lc}"/>`;});
+  if(fate==="sick")s+=`<circle cx="${cx-18}" cy="${by-35}" r="3" fill="#6B4A1E"/><circle cx="${cx+20}" cy="${by-47}" r="3" fill="#6B4A1E"/><circle cx="${cx-12}" cy="${by-62}" r="2.5" fill="#6B4A1E"/>`;
+  if(p.sensor)s+=`<circle cx="${cx+22}" cy="${by-50}" r="4" fill="#E0AE4E" filter="url(#glow)"/>`;
+  s+=`<text x="${cx}" y="${by+20}" text-anchor="middle" class="m" style="font-size:11px">P${i+1}${p.iso?" · 격리":""}</text>`;
+  if(fate)s+=`<text x="${cx}" y="${by-78}" text-anchor="middle" style="font-size:10px;fill:${fate==="sick"?"var(--ruby)":"var(--leaf)"}">${fate==="sick"?"발병":fate==="saved"?"조기 방제":"건강"}</text>`;
+  return s+"</g>";}
+function pRender(){
+  let s=`<defs>${GLOW}</defs><rect width="400" height="270" rx="8" style="fill:var(--bench)"/>`;
+  s+=`<text x="16" y="22" class="mu">온실${pw?" · 7일 뒤":" · 오늘 (모두 건강해 보임)"}</text>`;
+  [0,1,2,3,4,5].forEach(i=>{s+=plantSVG(70+(i%3)*130,i<3?125:245,i);});
+  $("p-scene").innerHTML=SVG("0 0 400 270",s);
+  $("p-scene").querySelectorAll("g[data-i]").forEach(g=>g.onclick=()=>pPick(+g.dataset.i));
+  // 스펙트럼
+  const W=400,H=170,L=34,R=W-10,T=14,B=H-30,X=x=>L+(x-200)/1600*(R-L),Y=y=>B-y/1.2*(B-T);
+  let q=`<rect width="${W}" height="${H}" rx="8" style="fill:var(--bench)"/>`;
+  for(let y=0;y<=1.2;y+=.4)q+=`<line x1="${L}" y1="${Y(y)}" x2="${R}" y2="${Y(y)}" style="stroke:var(--line)"/>`;
+  for(let x=200;x<=1800;x+=200)q+=`<text x="${X(x)}" y="${H-14}" text-anchor="middle" class="m mu" style="font-size:10px">${x}</text>`;
+  q+=`<text x="${(L+R)/2}" y="${H-2}" text-anchor="middle" class="mu" style="font-size:10px">라만 이동 (cm⁻¹)</text>`;
+  [[729,"ATP 729","#1FA67A",T+10],[1035,"SA 1035","#E07B24",T+10]].forEach(([x,t,c,y])=>{q+=`<line x1="${X(x)}" y1="${T}" x2="${X(x)}" y2="${B}" stroke="${c}" stroke-dasharray="4 4"/><text x="${X(x)+3}" y="${y}" style="font-size:10px;fill:${c}">${t}</text>`;});
+  q+=`<text x="${X(235)+6}" y="${T+24}" class="mu" style="font-size:9px">235 은 나노셸</text><text x="${X(790)}" y="${Y(.55)}" text-anchor="middle" class="mu" style="font-size:9px">PDDA 790(기준)</text>`;
+  q+=`<text x="${X(1155)}" y="${B+0}" text-anchor="middle" class="mu" style="font-size:9px"></text>`;
+  const path=a=>"M"+a.map((y,i)=>`${X(XS[i]).toFixed(1)} ${Y(y).toFixed(1)}`).join(" L");
+  if(sel!==null){const p=pl[sel];
+    if(p.sNo)q+=`<path d="${path(p.sNo)}" fill="none" style="stroke:var(--muted)" stroke-width="1.5"/>`;
+    if(p.sYes)q+=`<path d="${path(p.sYes)}" fill="none" style="stroke:var(--gold)" stroke-width="2"/>`;
+    q+=`<text x="${R}" y="${T+10}" text-anchor="end" style="font-size:11px">P${sel+1}</text>`;
+    if(p.sNo)q+=`<text x="${R}" y="${T+24}" text-anchor="end" class="mu" style="font-size:10px">회색: 센서 없음</text>`;
+    if(p.sYes)q+=`<text x="${R}" y="${T+38}" text-anchor="end" style="font-size:10px;fill:var(--gold)">금색: 센서 주입 후</text>`;
+    if(!p.sNo&&!p.sYes)q+=`<rect x="${(L+R)/2-172}" y="${(T+B)/2-19}" width="344" height="28" rx="6" style="fill:var(--panel);stroke:var(--line)"/><text x="${(L+R)/2}" y="${(T+B)/2}" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--fg)">라만 레이저로 측정하면 여기에 스펙트럼이 나타나요</text>`;}
+  else q+=`<rect x="${(L+R)/2-100}" y="${(T+B)/2-19}" width="200" height="28" rx="6" style="fill:var(--panel);stroke:var(--line)"/><text x="${(L+R)/2}" y="${(T+B)/2}" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--fg)">식물을 고르세요</text>`;
+  $("p-spec").innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="라만 스펙트럼">${q}</svg>`;
+}
+
+(function(){const b=$("intro-play"),svs=()=>document.querySelectorAll(".intro svg");let on=true;
+  const set=v=>{on=v;svs().forEach(x=>v?x.unpauseAnimations():x.pauseAnimations());b.textContent=v?"⏸ 움직임 멈추기":"▶ 움직임 다시 보기";};
+  b.onclick=()=>set(!on);
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)setTimeout(()=>set(false),50);})();
+
+/* ---------- 1차시 LFA 원리 애니메이션 ---------- */
+(function(){
+  const svg=$("lfa-svg"),cap=$("lfa-cap"),NS="http://www.w3.org/2000/svg";
+  const X0=24,X1=616,TX=330,CX=420,V=45,T=17;   // 이동 속도 약 45/초 (3차시 그림과 비슷)
+  let pos=true,on=true,acc=0,last=null,parts=[];
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  function setup(){parts=[];const n=8,nb=pos?5:0;
+    for(let i=0;i<n;i++){const x0=rnd(108,170),y=rnd(98,124),b=i<nb;
+      parts.push({x0,y,b,ax:b?rnd(36,80):null,ay:y+rnd(-4,4),stop:b?TX+rnd(-2,2):CX+rnd(-2,2)});}}
+  const front=t=>t<1.2?-1:Math.min(X1,X0+(t-1.2)*V*1.15);
+  function frame(t){
+    const F=front(t);let h="";
+    h+=`<rect x="${X0}" y="90" width="${X1-X0}" height="44" rx="3" fill="#E8E2D2"/>`;
+    h+=`<rect x="${X0}" y="90" width="90" height="44" fill="#E9D8B4"/><rect x="104" y="90" width="76" height="44" fill="#F1D6D6"/>`;
+    h+=`<rect x="180" y="90" width="352" height="44" fill="#FBFBF8"/><rect x="532" y="90" width="${X1-532}" height="44" fill="#CFCFC8"/>`;
+    if(F>X0)h+=`<rect x="${X0}" y="90" width="${(F-X0).toFixed(1)}" height="44" fill="#7FB8E6" opacity=".22"/>`;
+    // 줄 (도착한 입자 수에 따라 진해짐)
+    const arrT=parts.filter(p=>p.b&&p.cur>=p.stop-.5).length,arrC=parts.filter(p=>!p.b&&p.cur>=p.stop-.5).length;
+    h+=`<rect x="${TX-4}" y="90" width="8" height="44" fill="#B3263A" opacity="${(.08+.85*arrT/5).toFixed(2)}"/>`;
+    h+=`<rect x="${CX-4}" y="90" width="8" height="44" fill="#B3263A" opacity="${(.08+.85*Math.min(1,arrC/3)).toFixed(2)}"/>`;
+    // 고정된 포획 항체 (Y)
+    for(let y=96;y<=128;y+=8){h+=Y(TX,y,"#5E6670",.8);h+=Y(CX,y,"#2F6FA8",.8);}
+    // 입자
+    parts.forEach(p=>{
+      let x=p.x0,ax=p.ax;
+      if(p.b){const ta=t-1.2;ax=Math.min(p.x0-6,p.ax+Math.max(0,ta)*V);
+        if(ax>=p.x0-6&&F>=p.x0){const tr=1.2+(p.x0-6-p.ax)/V;x=Math.min(p.stop,p.x0+Math.max(0,t-tr-.4)*V);ax=x-6;}}
+      else{if(F>=p.x0){const tr=1.2+(p.x0-X0)/(V*1.15);x=Math.min(p.stop,p.x0+Math.max(0,t-tr)*V);}}
+      p.cur=x;
+      if(p.b&&t>1)h+=AG(ax,p.ay);
+      h+=AU(x,p.y);});
+    // 시료 방울
+    if(t<1.4){const dy=Math.min(1,t/1)*58;h+=`<path d="M60 ${18+dy} q-9 13 0 20 q9 -7 0 -20z" fill="#7FB8E6" opacity="${t<1.2?1:(1.4-t)/.2}"/>`;}
+    // 라벨
+    h+=`<text x="${X0+45}" y="80" text-anchor="middle" class="mu">시료 패드</text><text x="142" y="80" text-anchor="middle" class="mu">결합 패드</text>`;
+    h+=`<text x="${TX}" y="80" text-anchor="middle" style="font-weight:700;fill:#B3263A">T선</text><text x="${CX}" y="80" text-anchor="middle" style="font-weight:700;fill:#B3263A">C선</text>`;
+    h+=`<text x="574" y="80" text-anchor="middle" class="mu">흡수 패드</text>`;
+    h+=`<text x="${TX}" y="152" text-anchor="middle" class="mu" style="font-size:10px">검사선: 포획 항체</text><text x="${CX}" y="152" text-anchor="middle" class="mu" style="font-size:10px">대조선</text>`;
+    h+=`<text x="480" y="152" text-anchor="middle" class="mu" style="font-size:10px">흐르는 방향 →</text>`;
+    // 범례
+    h+=`<g transform="translate(24 178)">${AU(6,8)}<text x="18" y="12">금나노입자 + 항체</text>${AG(160,8)}<text x="172" y="12">항원 (바이러스 단백질)</text>${Y(330,8,"#5E6670",1)}<text x="342" y="12">T선 포획 항체</text>${Y(460,8,"#2F6FA8",1)}<text x="472" y="12">C선 항체</text></g>`;
+    // 결과 창
+    if(t>13.5){const r=pos?"양성 · 두 줄 (T선 + C선)":"음성 · 한 줄 (C선만)";
+      h+=`<rect x="190" y="2" width="260" height="30" rx="6" fill="var(--panel)" stroke="#B3263A"/><text x="320" y="22" text-anchor="middle" style="font-size:14px;font-weight:700;fill:#B3263A">${r}</text>`;}
+    svg.innerHTML=h;
+    cap.textContent=t<1.2?"① 키트의 시료 패드에 시료를 떨어뜨려요.":
+      t<4.2?(pos?"② 시료가 종이를 따라 스며들어 이동해요(모세관 현상). 시료 속 항원(보라색)도 함께 이동해요.":"② 시료가 종이를 따라 스며들어 이동해요(모세관 현상). 이 시료에는 항원이 없어요."):
+      t<7.6?(pos?"③ 결합 패드에서 항원이 금나노-항체에 달라붙어요. 함께 오른쪽으로 흘러가요.":"③ 결합 패드의 금나노-항체가 액체에 실려 흘러가요. 붙을 항원이 없어요."):
+      t<10?(pos?"④ T선의 포획 항체가 '항원 + 금나노'를 붙잡아요. 금나노가 모이면서 빨간 줄이 생겨요!":"④ T선의 포획 항체는 항원이 붙은 것만 잡아요. 그래서 금나노-항체는 그냥 지나가요."):
+      t<13.5?"⑤ 남은 금나노-항체는 C선에서 붙잡혀요. C선이 보이면 시료가 끝까지 잘 흘렀다는 뜻이에요.":
+      (pos?"결과: T선과 C선 두 줄 → 양성":"결과: C선 한 줄 → 음성");
+  }
+  function Y(x,y,c,s){return `<path d="M${x} ${y+4*s} L${x} ${y} M${x} ${y} L${x-3*s} ${y-3.5*s} M${x} ${y} L${x+3*s} ${y-3.5*s}" stroke="${c}" stroke-width="1.4" fill="none"/>`;}
+  function AU(x,y){return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="#B3263A"/>`+Y(x+6,y-1,"#7A1A28",.8).replace(/M([\d.]+) /,"M$1 ");}
+  function AG(x,y){x=+x;return `<path d="M${(x).toFixed(1)} ${y-4} l1.4 2.8 3 .4 -2.2 2.1 .5 3 -2.7 -1.4 -2.7 1.4 .5 -3 -2.2 -2.1 3 -.4z" fill="#7A4FD0"/>`;}
+  function tick(ts){if(last!==null&&on)acc+=(ts-last)/1000;last=ts;if(acc>T){acc=0;setup();}frame(acc);requestAnimationFrame(tick);}
+  const mark=()=>{$("lfa-pos").style.borderColor=pos?"var(--gold)":"";$("lfa-neg").style.borderColor=pos?"":"var(--gold)";};
+  $("lfa-pos").onclick=()=>{pos=true;acc=0;setup();mark();};
+  $("lfa-neg").onclick=()=>{pos=false;acc=0;setup();mark();};
+  $("lfa-play").onclick=()=>{on=!on;$("lfa-play").textContent=on?"⏸ 움직임 멈추기":"▶ 움직임 다시 보기";};
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches){on=false;acc=14;$("lfa-play").textContent="▶ 움직임 다시 보기";}
+  setup();requestAnimationFrame(tick);
+})();
+
+/* ---------- 2차시 B 카본닷 형광: 에너지 계단 애니메이션 ---------- */
+(function(){
+  const svg=$("fl-svg"),cap=$("fl-cap");
+  let light="uv",rat="1",on=true,acc=0,last=null;const T=7,SL=1.6;
+  const G=212,UP=50;                            // 바닥 상태, UV로 올라가는 높이
+  const MID=()=>rat==="1"?92:122;               // 열을 잃고 멈추는 계단 (질소 많으면 간격 좁음)
+  const EM=()=>rat==="1"?{c:"#4F8CFF",n:"파란색 (약 450 nm)"}:{c:"#9BD84A",n:"연두색 (약 520 nm)"};
+  const lerp=(a,b,k)=>a+(b-a)*Math.max(0,Math.min(1,k));
+  const wave=(x0,x1,y,c,ph,amp=6,wl=14)=>{let d=`M${x0} ${y}`;for(let x=x0;x<=x1;x+=2)d+=` L${x} ${(y+amp*Math.sin((x-ph)/wl*2*Math.PI)).toFixed(1)}`;return `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>`;};
+  function frame(t){
+    const uv=light==="uv",E=EM(),M=MID();let h="";
+    // 왼쪽: 빛과 카본닷
+    const dot={x:200,y:130};
+    const LC=uv?"#7A4FD0":"#3FAE45";
+    if(t<1.6){const head=lerp(10,dot.x-34,t/1.6);h+=wave(Math.max(10,head-90),head,dot.y,LC,t*60,uv?6:5,uv?10:16);}
+    if(!uv&&t>=1.6&&t<3.6){const head=lerp(dot.x+34,300,(t-1.6)/2);h+=wave(Math.max(dot.x+34,head-90),head,dot.y,LC,t*60,5,16);}
+    const glow=uv&&t>3.2&&t<6.2?Math.sin(Math.PI*Math.min(1,(t-3.2)/3)):0;
+    if(glow>0)h+=`<circle cx="${dot.x}" cy="${dot.y}" r="${36+22*glow}" fill="${E.c}" opacity="${(.45*glow).toFixed(2)}"/>`;
+    h+=`<circle cx="${dot.x}" cy="${dot.y}" r="28" fill="#3A2E28"/>`;
+    [[0,-28,"N"],[24,-14,"O"],[26,12,"N"],[-25,13,"O"],[-22,-17,"N"],[6,27,"O"]].forEach(([dx,dy,a])=>{const nn=a==="N"&&rat==="5";
+      h+=`<circle cx="${dot.x+dx}" cy="${dot.y+dy}" r="${nn?6:5}" fill="${a==="N"?"#3B6EF0":"#E05A4A"}"/><text x="${dot.x+dx}" y="${dot.y+dy+3}" text-anchor="middle" style="font-size:8px;fill:#fff;font-weight:700">${a}</text>`;});
+    h+=`<text x="${dot.x}" y="${dot.y+50}" text-anchor="middle" class="mu">카본닷 (수 nm)</text>`;
+    h+=`<text x="16" y="${dot.y-16}" style="fill:${LC};font-weight:700">${uv?"UV 365 nm":"녹색 빛 530 nm"}</text>`;
+    if(uv&&t>3.2&&t<5.6){const k=(t-3.2)/2.4,r0=34+k*80;
+      h+=`<path d="M${dot.x+r0*Math.cos(-.6)} ${dot.y+r0*Math.sin(-.6)} A${r0} ${r0} 0 0 1 ${dot.x+r0*Math.cos(.6)} ${dot.y+r0*Math.sin(.6)}" fill="none" stroke="${E.c}" stroke-width="3" opacity="${(1-k).toFixed(2)}"/>`;
+      h+=`<text x="${dot.x+40}" y="${dot.y-46}" style="fill:${E.c};font-weight:700">${E.n}</text>`;}
+    // 오른쪽: 에너지 계단
+    const X0=330,X1=520;
+    h+=`<line x1="${X0-28}" y1="${G+6}" x2="${X0-28}" y2="24" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#fla)"/><text x="${X0-34}" y="20" text-anchor="end" class="mu" style="font-size:11px">에너지</text>`;
+    h+=`<defs><marker id="fla" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#9AA0A8"/></marker></defs>`;
+    [[G,"바닥 상태"],[M,"들뜬 상태 (아래)"],[UP,"들뜬 상태 (위)"]].forEach(([y,l])=>{h+=`<line x1="${X0}" y1="${y}" x2="${X1}" y2="${y}" stroke="var(--fg)" stroke-width="3" opacity=".75"/><text x="${X1+6}" y="${y+4}" style="font-size:11px" class="mu">${l}</text>`;});
+    for(let y=UP+10;y<M;y+=10)h+=`<line x1="${X0+120}" y1="${y}" x2="${X0+170}" y2="${y}" stroke="#9AA0A8" stroke-width="1" opacity=".5"/>`;
+    // 전자 위치와 화살표
+    let ex=X0+40,ey=G;
+    if(uv){
+      if(t>=1.6&&t<2.2){ey=lerp(G,UP,(t-1.6)/.6);}
+      else if(t>=2.2&&t<3.2){const k=(t-2.2)/1;ex=lerp(X0+40,X0+150,k);ey=lerp(UP,M,k);}
+      else if(t>=3.2&&t<3.8){ex=X0+150;ey=lerp(M,G,(t-3.2)/.6);}
+      else if(t>=3.8){ex=lerp(X0+150,X0+40,Math.min(1,(t-3.8)/1.5));ey=G;}
+      if(t>=1.6)h+=`<line x1="${X0+40}" y1="${G}" x2="${X0+40}" y2="${UP+8}" stroke="#7A4FD0" stroke-width="4" marker-end="url(#flv)"/><text x="${X0+48}" y="${(G+UP)/2}" style="fill:#7A4FD0;font-weight:700;font-size:12px">① UV 흡수</text>`;
+      if(t>=2.2){let d=`M${X0+48} ${UP+4}`;for(let k=0;k<=1;k+=.05)d+=` L${(X0+48+k*100+4*Math.sin(k*30)).toFixed(1)} ${(UP+4+k*(M-UP-6)).toFixed(1)}`;h+=`<path d="${d}" fill="none" stroke="#E07B24" stroke-width="2"/><text x="${X0+66}" y="${UP+18}" style="fill:#E07B24;font-size:12px;font-weight:700">② 열로 조금 잃음</text>`;}
+      if(t>=3.2)h+=`<line x1="${X0+150}" y1="${M}" x2="${X0+150}" y2="${G-8}" stroke="${E.c}" stroke-width="4" marker-end="url(#fle)"/><text x="${X0+158}" y="${(M+G)/2+4}" style="fill:${E.c};font-weight:700;font-size:12px">③ 빛을 냄</text>`;
+    }else{
+      const GY=Math.max(G-(G-M)*(rat==="1"?450:520)/530,M+12);
+      if(t>=1.4&&t<2.6){const k=(t-1.4)/1.2;ey=G-Math.sin(Math.PI*k)*(G-GY);}
+      h+=`<line x1="${X0}" y1="${GY}" x2="${X1}" y2="${GY}" stroke="#3FAE45" stroke-width="1.5" stroke-dasharray="4 4"/><text x="${X0+4}" y="${GY+14}" style="fill:#3FAE45;font-size:11px">녹색 빛 에너지로 오를 수 있는 높이</text>`;
+      if(t>=2.6)h+=`<text x="${(X0+X1)/2}" y="${G-14}" text-anchor="middle" style="fill:#B3263A;font-weight:700">✕ 들뜬 상태 계단에 닿지 못해 흡수 안 됨</text>`;
+    }
+    h+=`<defs><marker id="flv" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7A4FD0"/></marker><marker id="fle" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="${E.c}"/></marker></defs>`;
+    h+=`<circle cx="${ex}" cy="${ey-7}" r="7" fill="#F2B83A" stroke="#7A5A10"/><text x="${ex}" y="${ey-4}" text-anchor="middle" style="font-size:9px;font-weight:700;fill:#5A3E00">e⁻</text>`;
+    svg.innerHTML=h;
+    cap.textContent=uv?(t<1.6?"카본닷에 UV(365 nm)를 비춰요. UV는 눈에 보이지 않지만 가시광선보다 에너지가 커요.":
+      t<2.2?"① 카본닷이 UV를 흡수해요. 전자가 높은 에너지 계단으로 뛰어올라요(들뜬 상태).":
+      t<3.2?"② 전자는 높은 계단에 오래 못 있어요. 먼저 에너지 일부를 진동(열)으로 잃고 조금 내려와요.":
+      `③ 남은 에너지만큼 빛을 내며 바닥으로 내려와요. 들어온 UV보다 에너지가 작은, ${E.n} 빛이에요. 이것이 형광이에요!`):
+      (t<1.6?"카본닷에 녹색 빛(530 nm)을 비춰요.":t<2.6?"녹색 빛은 에너지가 작아서 전자를 높은 계단까지 올려 주지 못해요.":
+      "흡수가 안 되니 빛은 그냥 지나가고, 카본닷은 빛나지 않아요.");
+  }
+  function tick(ts){if(last!==null&&on)acc+=(ts-last)/1000/SL;last=ts;if(acc>T)acc=0;frame(acc);requestAnimationFrame(tick);}
+  const mark=()=>{$("fl-uv").style.borderColor=light==="uv"?"var(--gold)":"";$("fl-gr").style.borderColor=light==="gr"?"var(--gold)":"";
+    $("fl-r1").style.borderColor=rat==="1"?"var(--gold)":"";$("fl-r5").style.borderColor=rat==="5"?"var(--gold)":"";};
+  $("fl-uv").onclick=()=>{light="uv";acc=0;mark();};$("fl-gr").onclick=()=>{light="gr";acc=0;mark();};
+  $("fl-r1").onclick=()=>{rat="1";acc=0;mark();};$("fl-r5").onclick=()=>{rat="5";acc=0;mark();};
+  $("fl-play").onclick=()=>{on=!on;$("fl-play").textContent=on?"⏸ 움직임 멈추기":"▶ 움직임 다시 보기";};
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches){on=false;acc=4.4;$("fl-play").textContent="▶ 움직임 다시 보기";}
+  window.__flRestart=()=>{acc=0;};mark();requestAnimationFrame(tick);
+})();
+
+/* ---------- 실험 노트 제출 · 복사 · 저장 ---------- */
+/* 선생님 설정: Google 시트의 Apps Script를 '웹 앱'으로 배포한 뒤 받은 주소(…/exec)를 따옴표 안에 붙여 넣으세요. */
+const SUBMIT_URL="https://script.google.com/macros/s/AKfycbw4ZV4H60Pu5iG9NeQfM-dlKggr42aF7Q7fEPK1OcxNN7SMQH7wuSEJroaLoox4LQDg/exec";
+(function(){
+  const LES={k:"1차시 A 신속항원검사",g:"1차시 C 금나노 합성",c:"2차시 A 카본닷 합성",p:"3차시 B 식물 SERS 측정"};
+  const ids=["stu-cls","stu-num","stu-name"];
+  try{const sv=JSON.parse(localStorage.getItem("nano-stu")||"{}");ids.forEach(i=>{if(sv[i])$(i).value=sv[i];});}catch(e){}
+  ids.forEach(i=>$(i).addEventListener("input",()=>{try{localStorage.setItem("nano-stu",JSON.stringify(Object.fromEntries(ids.map(j=>[j,$(j).value.trim()]))));}catch(e){}}));
+  const stu=()=>({cls:$("stu-cls").value.trim(),num:$("stu-num").value.trim(),name:$("stu-name").value.trim()});
+  const msg=(k,t)=>{$(k+"-subm").textContent=t;};
+  function noteLines(k){return [...document.querySelectorAll("#"+k+"-log li")].map(li=>li.textContent.trim()).filter(Boolean);}
+  function tableText(){const t=document.querySelector("#k-table table");if(!t)return "";
+    return [...t.rows].map(r=>[...r.cells].map(c=>(c.innerText||c.textContent).replace(/\s+/g," ").trim()||"-").join(" | ")).join("\n");}
+  function noteText(k){const L=noteLines(k);let out=L.map((l,i)=>`${i+1}. ${l}`).join("\n");
+    if(k==="k"){const tb=tableText();if(tb)out+="\n\n[결과표]\n"+tb;}return out;}
+  function fullText(k){const u=stu(),now=new Date();
+    return `나노 바이오센서 탐구실 · ${LES[k]}\n${u.cls||"?"}반 ${u.num||"?"}번 ${u.name||"(이름 없음)"} · ${now.toLocaleString("ko-KR")}\n\n${noteText(k)}\n`;}
+  async function copyText(t){try{await navigator.clipboard.writeText(t);return true;}catch(e){
+    const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+    let ok=false;try{ok=document.execCommand("copy");}catch(e2){}ta.remove();return ok;}}
+  document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const k=b.dataset.copy;
+    if(!noteLines(k).length)return msg(k,"아직 실험 노트가 비어 있어요. 실험을 먼저 진행해 보세요.");
+    msg(k,await copyText(fullText(k))?"복사했어요. 클래스룸이나 게시판에 붙여 넣으면 돼요.":"복사하지 못했어요. '텍스트 파일로 저장'을 이용해 주세요.");});
+  document.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>{const k=b.dataset.save;
+    if(!noteLines(k).length)return msg(k,"아직 실험 노트가 비어 있어요. 실험을 먼저 진행해 보세요.");
+    const u=stu(),blob=new Blob(["﻿"+fullText(k)],{type:"text/plain;charset=utf-8"}),a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download=`나노바이오센서탐구실_${LES[k].split(" ")[0]}${LES[k].split(" ")[1].length<=1?LES[k].split(" ")[1]:""}_${u.cls||""}반${u.num||""}번_${u.name||"이름없음"}.txt`;
+    document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);msg(k,"텍스트 파일로 저장했어요.");});
+  document.querySelectorAll("[data-sub]").forEach(b=>b.onclick=async()=>{const k=b.dataset.sub,u=stu();
+    if(!u.cls||!u.num||!u.name){msg(k,"맨 위 '내 정보'에 반, 번호, 이름을 먼저 적어 주세요.");$(!u.cls?"stu-cls":!u.num?"stu-num":"stu-name").focus();return;}
+    if(!noteLines(k).length)return msg(k,"아직 실험 노트가 비어 있어요. 실험을 먼저 진행해 보세요.");
+    if(!SUBMIT_URL)return msg(k,"선생님이 아직 제출 주소를 설정하지 않았어요. '노트 복사'나 '텍스트 파일로 저장'으로 제출해 주세요.");
+    b.disabled=true;msg(k,"보내는 중…");
+    try{await fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify({cls:u.cls,num:u.num,name:u.name,lesson:LES[k],note:noteText(k),sent:new Date().toISOString()})});
+      msg(k,`제출했어요 (${new Date().toLocaleTimeString("ko-KR")}). 실험을 더 하고 다시 제출하면 새 줄로 추가돼요.`);}
+    catch(e){msg(k,"인터넷 연결 문제로 보내지 못했어요. '텍스트 파일로 저장'으로 노트를 보관해 두세요.");}
+    finally{setTimeout(()=>{b.disabled=false;},3000);}});
+})();
+const RENDER={f:()=>window.__flRestart&&__flRestart(),r:()=>{},k:kRender,l:()=>{($("lfa-neg").style.borderColor?$("lfa-neg"):$("lfa-pos")).click();},g:gRender,c:cRender,p:pRender};
+kRender();gRender();cRender();pRender();
+
+/* ---------- 그림 크게 보기 ---------- */
+(function(){
+  const z=document.createElement("div");z.id="zoom";z.hidden=true;
+  z.setAttribute("role","dialog");z.setAttribute("aria-modal","true");z.setAttribute("aria-label","그림 크게 보기");
+  z.innerHTML='<div class="ib zbox"></div><div class="zcap">아무 곳이나 누르면 닫혀요 (Esc)</div>';
+  document.body.appendChild(z);
+  const box=z.querySelector(".zbox");let last=null,live=null,mark=null;
+  const LIVE=["fl-svg","lfa-svg"];   // 스크립트로 움직이는 그림: 복사하지 않고 원래 상자를 통째로 옮겨 와서 계속 움직이게 함
+  function open(sv){last=sv;
+    if(LIVE.includes(sv.id)){live=sv.closest(".ib");mark=document.createComment("zoom");live.before(mark);
+      box.innerHTML="";box.appendChild(live);live.classList.add("live");z.hidden=false;document.body.style.overflow="hidden";return;}
+    const src=sv.closest(".rf")||sv;const c=src.cloneNode(true);
+    c.removeAttribute("tabindex");c.querySelectorAll("[tabindex]").forEach(x=>x.removeAttribute("tabindex"));c.removeAttribute("id");c.querySelectorAll("[id]").forEach(x=>{if(x.tagName!=="linearGradient"&&x.tagName!=="radialGradient"&&x.tagName!=="clipPath")x.removeAttribute("id");});
+    box.innerHTML="";box.appendChild(c);z.hidden=false;document.body.style.overflow="hidden";}
+  function close(){if(z.hidden)return;z.hidden=true;
+    if(live){live.classList.remove("live");mark.replaceWith(live);live=null;mark=null;}
+    box.innerHTML="";document.body.style.overflow="";if(last)last.focus({preventScroll:true});}
+  z.addEventListener("click",e=>{if(e.target.closest("#zoom button"))return;close();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
+  const pick=t=>{const sv=t.closest&&t.closest(".intro svg[role='img']");return sv&&!sv.closest("#zoom")?sv:null;};
+  document.addEventListener("click",e=>{const sv=pick(e.target);if(sv)open(sv);});
+  document.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const sv=pick(e.target);if(sv){e.preventDefault();open(sv);}});
+  const tab=()=>document.querySelectorAll(".intro svg[role='img']").forEach(sv=>{if(!sv.hasAttribute("tabindex"))sv.setAttribute("tabindex","0");});
+  tab();new MutationObserver(tab).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+</body></html>
