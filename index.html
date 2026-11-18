@@ -391,7 +391,7 @@ h3::before{content:"";flex:none;width:5px;height:18px;border-radius:2px;backgrou
       <p>· 거의 모든 경우 분자는 <strong>원래 바닥 상태</strong>로 돌아와요. 나가는 빛의 에너지가 들어온 빛과 같아요 → <strong>레일리 산란</strong>(탄성 산란)<br>
       · 아주 드물게(산란되는 빛 약 1000만 개 중 1개) 분자가 <strong>바로 위 진동 준위(v=1)</strong>에 내려앉아요. 나가는 빛은 진동 에너지만큼 에너지를 잃어요 → <strong>스토크스 라만 산란</strong>(비탄성 산란)</p>
       <p class="key">라만 빛의 에너지 = 레이저 빛의 에너지 − 분자 진동 에너지. 빛의 에너지가 작아지면 파장이 길어져요(그림에서 연두 물결이 조금 더 느슨해요). 반대로 이미 진동하던 분자에서 에너지를 얻어 오는 '안티-스토크스' 산란도 있지만 더 드물어서 보통 스토크스 쪽을 측정해요.</p></div>
-    <div class="ib"><h4><b>3</b>분자마다 다른 '지문'</h4><svg class="fs3" viewBox="0 0 260 150" role="img" aria-label="분자마다 봉우리 위치가 다른 라만 스펙트럼 예시">
+    <div class="ib"><h4><b>3</b>분자마다 다른 '지문'</h4><svg class="fs3" viewBox="0 0 260 150" role="img" aria-label="분자마다 피크 위치가 다른 라만 스펙트럼 예시">
   <line x1="20" y1="118" x2="252" y2="118" stroke="#9AA0A8"/><line x1="20" y1="10" x2="20" y2="118" stroke="#9AA0A8"/>
   <path d="M20 112 L60 112 L66 72 L72 112 L120 112 L126 92 L132 112 L190 112 L196 60 L202 112 L252 112" fill="none" stroke="#E07B24" stroke-width="2"/>
   <path d="M20 116 L84 116 L90 50 L96 116 L150 116 L156 86 L162 116 L252 116" fill="none" stroke="#1FA67A" stroke-width="2"/>
@@ -399,8 +399,8 @@ h3::before{content:"";flex:none;width:5px;height:18px;border-radius:2px;backgrou
   <text x="136" y="136" text-anchor="middle" class="mu">라만 이동 (cm⁻¹) → 빛이 잃은 에너지</text>
   <text x="14" y="64" text-anchor="middle" class="mu" transform="rotate(-90 14 64)">세기</text>
 </svg>
-      <p>분자는 원자의 종류와 결합 방식에 따라 <strong>진동하는 방식이 달라요.</strong> 그래서 빛이 잃는 에너지(라만 이동)도 분자마다 달라요. 봉우리가 나타나는 <strong>위치</strong>를 보면 어떤 분자인지 알 수 있어요. 그래서 라만 스펙트럼을 '분자의 지문'이라고 불러요.</p>
-      <p class="key">이번 실험: 살리실산은 1035 cm⁻¹, ATP는 729 cm⁻¹에서 봉우리가 나타나요.</p></div>
+      <p>분자는 원자의 종류와 결합 방식에 따라 <strong>진동하는 방식이 달라요.</strong> 그래서 빛이 잃는 에너지(라만 이동)도 분자마다 달라요. <strong>피크</strong>(그래프에서 뾰족하게 솟은 부분)가 나타나는 <strong>위치</strong>를 보면 어떤 분자인지 알 수 있어요. 그래서 라만 스펙트럼을 '분자의 지문'이라고 불러요.</p>
+      <p class="key">이번 실험: 살리실산은 1035 cm⁻¹, ATP는 729 cm⁻¹에서 피크가 나타나요.</p></div>
     <div class="ib"><h4><b>4</b>SERS: 금속 나노입자로 신호 키우기</h4><svg viewBox="0 0 324 146" role="img" aria-label="금 나노입자 하나는 양 끝이 밝고, 두 입자가 아주 가까이 있으면 틈이 가장 밝은 핫스팟이 되며, 핫스팟에 붙은 분자의 라만 신호가 약 천만 배 커지는 것을 나타낸 그림">
   <defs><radialGradient id="hot2"><stop offset="0" stop-color="#FFE45C"/><stop offset=".45" stop-color="#F0602A" stop-opacity=".85"/><stop offset="1" stop-color="#F0602A" stop-opacity="0"/></radialGradient>
   <radialGradient id="core2"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FFF6B0" stop-opacity="0"/></radialGradient></defs>
@@ -435,7 +435,7 @@ h3::before{content:"";flex:none;width:5px;height:18px;border-radius:2px;backgrou
 <section class="exp" id="p-p" hidden>
   <div class="col">
     <div class="card scene"><div id="p-scene"></div></div>
-    <div class="card scene"><h3>SERS 스펙트럼 (785 nm)</h3><div id="p-spec"></div><p class="note" style="font-size:10.5px;line-height:1.45">봉우리 위치 출처: Son, W. K. … Jeong, D. H., Kwak, S.-Y. In vivo surface-enhanced Raman scattering nanosensor for the real-time monitoring of multiple stress signalling molecules in plants. <i>Nature Nanotechnology</i> 18, 205–216 (2023), 서울대 정대홍·곽선영 교수 연구팀. 봉우리 세기와 잡음은 수업용으로 단순화한 모식 값이에요.</p></div>
+    <div class="card scene"><h3>SERS 스펙트럼 (785 nm)</h3><div id="p-spec"></div><p class="note" style="font-size:10.5px;line-height:1.45">피크 위치 출처: Son, W. K. … Jeong, D. H., Kwak, S.-Y. In vivo surface-enhanced Raman scattering nanosensor for the real-time monitoring of multiple stress signalling molecules in plants. <i>Nature Nanotechnology</i> 18, 205–216 (2023), 서울대 정대홍·곽선영 교수 연구팀. 피크 세기와 잡음은 수업용으로 단순화한 모식 값이에요.</p></div>
     <div class="msg" id="p-msg" data-kind="info">온실의 보리는 모두 건강해 보입니다. 그런데 두 그루는 붉은곰팡이(<i>F. graminearum</i>)에 막 감염됐어요. 겉모습으로는 알 수 없어요. 보리를 하나 골라 보세요.</div>
   </div>
   <div class="col">
@@ -915,10 +915,10 @@ setInterval(()=>{if(c.mw!=="run")return;c.mwP+=.02;
    4. 식물 SERS 측정
    ====================================================== */
 const P=Exp("p",[["pick","온실의 보리를 하나 고른다 (보리를 눌러도 돼요)"],["meas0","센서 없이 785 nm 라만 레이저로 측정해 본다"],["sensor","잎 뒷면 기공으로 은 나노셸 센서(AgNS@PDDA)를 주입한다"],
-  ["meas","센서를 넣은 잎을 측정해 살리실산(1035 cm⁻¹)·ATP(729 cm⁻¹) 봉우리를 확인한다"],["all","6그루를 모두 센서로 측정한다"],["dec","신호가 강한 식물을 격리한다"],["week","7일 뒤 온실을 확인한다"]]);
+  ["meas","센서를 넣은 잎을 측정해 살리실산(1035 cm⁻¹)·ATP(729 cm⁻¹) 피크를 확인한다"],["all","6그루를 모두 센서로 측정한다"],["dec","신호가 강한 식물을 격리한다"],["week","7일 뒤 온실을 확인한다"]]);
 const XS=[];for(let x=200;x<=1800;x+=4)XS.push(x);
-/* 봉우리 위치(cm⁻¹): Son et al., Nat. Nanotechnol. 18, 205 (2023)
-   AgNS(Ag···O) 235 · PDDA 790(기준 봉우리) · 살리실산(SA) 808, 1035, 1248 · ATP 729, 1325
+/* 피크 위치(cm⁻¹): Son et al., Nat. Nanotechnol. 18, 205 (2023)
+   AgNS(Ag···O) 235 · PDDA 790(기준 피크) · 살리실산(SA) 808, 1035, 1248 · ATP 729, 1325
    세기는 수업용 모식 값 */
 const PK={ag:[[235,9,1]],pdda:[[790,9,.22]],sa:[[808,8,.3],[1035,8,.42],[1248,10,.24]],atp:[[729,7,.36],[1325,10,.18]]};
 const gau=(x,m,w)=>Math.exp(-((x-m)**2)/(2*w*w));
@@ -946,10 +946,10 @@ tools("p",[
     const p=pl[sel],a=spec(p,p.sensor);
     if(p.sensor){p.sYes=a;P.step("meas");const rs=ratio(a,1035),ra=ratio(a,729);
       P.log(`P${sel+1} · 센서 측정 · SA(1035)/PDDA ${rs.toFixed(2)} · ATP(729)/PDDA ${ra.toFixed(2)}`);
-      P.say(`P${sel+1}: 기준 봉우리(PDDA 790 cm⁻¹) 대비 살리실산 ${rs.toFixed(2)}, ATP ${ra.toFixed(2)}. ${rs>.6?"두 봉우리가 뚜렷해요! 식물이 병원균에 맞서 방어 신호를 내고 있다는 뜻이에요. 잎은 아직 초록색인데도요.":"신호 분자 봉우리가 거의 없어요. 235(은 나노셸)와 790(PDDA) 봉우리는 센서 자체의 신호예요."} 다른 보리와 비교해 보세요.`,rs>.6?"ok":"info");
+      P.say(`P${sel+1}: 기준 피크(PDDA 790 cm⁻¹) 대비 살리실산 ${rs.toFixed(2)}, ATP ${ra.toFixed(2)}. ${rs>.6?"두 피크가 뚜렷해요! 식물이 병원균에 맞서 방어 신호를 내고 있다는 뜻이에요. 잎은 아직 초록색인데도요.":"신호 분자 피크가 거의 없어요. 235(은 나노셸)와 790(PDDA) 피크는 센서 자체의 신호예요."} 다른 보리와 비교해 보세요.`,rs>.6?"ok":"info");
       if(pl.every(q=>q.sYes))P.step("all");}
-    else{p.sNo=a;P.step("meas0");P.log(`P${sel+1} · 센서 없이 측정 · 뚜렷한 봉우리 없음`);
-      P.say("센서 없이 측정하면 뚜렷한 봉우리가 보이지 않아요. 잎 속 신호 분자는 아주 적어서(µM 이하) 보통 라만 신호로는 묻혀 버려요. 785 nm 근적외선을 쓰는 이유는 엽록소의 강한 형광을 피하기 위해서예요. 센서를 넣고 다시 측정해 보세요.","info");}
+    else{p.sNo=a;P.step("meas0");P.log(`P${sel+1} · 센서 없이 측정 · 뚜렷한 피크 없음`);
+      P.say("센서 없이 측정하면 뚜렷한 피크가 보이지 않아요. 잎 속 신호 분자는 아주 적어서(µM 이하) 보통 라만 신호로는 묻혀 버려요. 785 nm 근적외선을 쓰는 이유는 엽록소의 강한 형광을 피하기 위해서예요. 센서를 넣고 다시 측정해 보세요.","info");}
     pRender();}},
   {id:"p-iso",label:"격리 표시",sub:"선택한 식물 켜기·끄기",fn:()=>{
     if(sel===null)return P.say("먼저 식물을 고르세요.","hint");if(pw)return;
